@@ -1,0 +1,18 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "prompt-toolkit",
+  "version": "2.4.1",
+  "description": "Six manual skills for prompt and goal refinement, read-only review, engineering, end-to-end delivery, and coordinator-led agent teamwork.",
+  "author": {
+    "name": "kai"
+  },
+  "keywords": [
+    "prompt",
+    "goal",
+    "review",
+    "engineering",
+    "end-to-end",
+    "multi-agent",
+    "teamwork"
+  ]
+}

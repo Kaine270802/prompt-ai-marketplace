@@ -1,0 +1,20 @@
+{
+  "name": "prompt-ai-marketplace",
+  "interface": {
+    "displayName": "Prompt AI Marketplace"
+  },
+  "plugins": [
+    {
+      "name": "prompt-toolkit",
+      "source": {
+        "source": "local",
+        "path": "./prompt-toolkit"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Engineering"
+    }
+  ]
+}

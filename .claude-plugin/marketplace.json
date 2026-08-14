@@ -1,0 +1,18 @@
+{
+  "name": "prompt-ai-marketplace",
+  "description": "Cross-host prompt refinement and software engineering skills.",
+  "owner": {
+    "name": "kai"
+  },
+  "plugins": [
+    {
+      "name": "prompt-toolkit",
+      "source": "./prompt-toolkit",
+      "description": "Six manual skills for prompt and goal refinement, read-only review, engineering, end-to-end delivery, and coordinator-led agent teamwork.",
+      "version": "2.4.1",
+      "author": {
+        "name": "kai"
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "prompt-ai-marketplace",
+  "plugins": [
+    {
+      "name": "prompt-toolkit",
+      "source": "./prompt-toolkit",
+      "description": "Bộ 6 skill cho prompt/goal refinement, read-only review, delivery end-to-end và coordinator-led agent teamwork."
+    }
+  ]
+}

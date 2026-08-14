@@ -1,0 +1,35 @@
+{
+  "name": "prompt-toolkit",
+  "version": "2.4.1+codex.20260814075500",
+  "description": "Six manual skills for prompt and goal refinement, read-only review, engineering, end-to-end delivery, and coordinator-led agent teamwork.",
+  "author": {
+    "name": "kai"
+  },
+  "keywords": [
+    "prompt",
+    "review",
+    "engineering",
+    "end-to-end",
+    "goal",
+    "multi-agent",
+    "teamwork"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Prompt Toolkit",
+    "shortDescription": "Review, refine, implement, and verify coding tasks",
+    "longDescription": "Six manual skills including a coordinator-led teamwork workflow: Team Sheet, user approval, specialized parallel subagents, independent verifier/critic, and sequential fallback when native subagents are unavailable.",
+    "developerName": "kai",
+    "category": "Engineering",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Research"
+    ],
+    "defaultPrompt": [
+      "Use teamwork-preview to design a Team Sheet, get approval, then coordinate specialized subagents with independent verification",
+      "Use e2e to complete this coding request; for complex work, staff the pipeline with a Team Sheet and independent verification",
+      "Use review for a read-only, evidence-cited code audit"
+    ]
+  }
+}
