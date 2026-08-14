@@ -255,8 +255,14 @@ Uninstall plugin đó, rồi dùng `~/.cursor/plugins/local` ở trên. Muốn g
 local thì `git init` + commit ít nhất một lần trong `prompt-ai-marketplace/`, sau đó
 add lại.
 
-Team marketplace (Teams/Enterprise): **Dashboard → Plugins → Add Marketplace**, trỏ
-Git repo có `.cursor-plugin/marketplace.json`. Developer cài từ **Customize**.
+GitHub marketplace (khuyến nghị): **Customize → Add Marketplace**, dán
+
+```text
+https://github.com/Kaine270802/prompt-ai-marketplace
+```
+
+rồi Install **prompt-toolkit**. Team / Enterprise: **Dashboard → Plugins → Add
+Marketplace** → Import from Repo, cùng URL.
 
 Local marketplace (folder này): **Customize → Add Marketplace**, dán
 
@@ -265,8 +271,9 @@ D:\Macbook\PROMPT AI\prompt-ai-marketplace
 ```
 
 rồi Install **prompt-toolkit**. Manifest: `.cursor-plugin/marketplace.json`, plugin
-source `prompt-toolkit` (không dùng `./`). Sau khi `git init` + commit, Uninstall
-bản lỗi `HEAD` rồi add lại marketplace — đừng giữ entry `file://` cũ.
+source `prompt-toolkit` (không dùng `./`). Folder phải là git repo đã commit. Sau
+khi `git init` + commit, Uninstall bản lỗi `HEAD` rồi add lại — đừng giữ entry
+`file://` cũ.
 
 Fallback skill-only:
 
