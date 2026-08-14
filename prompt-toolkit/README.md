@@ -258,6 +258,16 @@ add lại.
 Team marketplace (Teams/Enterprise): **Dashboard → Plugins → Add Marketplace**, trỏ
 Git repo có `.cursor-plugin/marketplace.json`. Developer cài từ **Customize**.
 
+Local marketplace (folder này): **Customize → Add Marketplace**, dán
+
+```text
+D:\Macbook\PROMPT AI\prompt-ai-marketplace
+```
+
+rồi Install **prompt-toolkit**. Manifest: `.cursor-plugin/marketplace.json`, plugin
+source `prompt-toolkit` (không dùng `./`). Sau khi `git init` + commit, Uninstall
+bản lỗi `HEAD` rồi add lại marketplace — đừng giữ entry `file://` cũ.
+
 Fallback skill-only:
 
 Workspace:

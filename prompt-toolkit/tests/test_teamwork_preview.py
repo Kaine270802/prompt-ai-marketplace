@@ -132,8 +132,13 @@ class TeamworkPreviewContractTest(unittest.TestCase):
         self.assertIn("~/.copilot/skills/", self.readme)
         self.assertIn("disable-model-invocation", self.readme)
         self.assertTrue((PLUGIN_ROOT / ".cursor-plugin" / "plugin.json").is_file())
-        self.assertTrue(
-            (MARKETPLACE_ROOT / ".cursor-plugin" / "marketplace.json").is_file()
+        cursor_market = load_json(
+            MARKETPLACE_ROOT / ".cursor-plugin" / "marketplace.json"
+        )
+        self.assertEqual(cursor_market["name"], "prompt-ai-marketplace")
+        self.assertEqual(cursor_market["plugins"][0]["source"], "prompt-toolkit")
+        self.assertFalse(
+            str(cursor_market["plugins"][0]["source"]).startswith("./")
         )
         plugin = load_json(PLUGIN_ROOT / "plugin.json")
         self.assertEqual(
