@@ -18,7 +18,7 @@ Mỗi skill là một thư mục `SKILL.md` theo
 | Skill | Chức năng | Kết quả |
 |---|---|---|
 | `ask` | Nghiên cứu context và nâng cấp raw prompt | Một prompt copy-ready; không thực thi task |
-| `goal` | Làm rõ outcome, scope và success criteria | Một goal copy-ready; để ngỏ cách thực hiện |
+| `goal` | Làm rõ outcome, scope và success criteria | Một goal copy-ready + auto-lưu `docs/goal/GOAL_*.txt`; để ngỏ cách thực hiện |
 | `review` | Audit/diagnose code ở chế độ read-only | Findings có evidence; mọi fix đều `NOT APPLIED` |
 | `engineer` | Thực hiện coding task theo Phase 0→4 | Thay đổi nhỏ nhất kèm tests và verification |
 | `boost` | Deep reasoning cho bug khó: hypotheses → investigate → patch → falsify | Root cause có repro test; patch tối thiểu qua adversarial check |

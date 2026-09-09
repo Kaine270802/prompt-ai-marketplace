@@ -9,7 +9,7 @@
       "name": "prompt-toolkit",
       "source": "./prompt-toolkit",
       "description": "Seven manual skills for prompt and goal refinement, read-only review, engineering, end-to-end delivery, and coordinator-led agent teamwork.",
-      "version": "2.6.0",
+      "version": "2.7.0",
       "author": {
         "name": "kai"
       }

@@ -1,6 +1,6 @@
 # prompt-ai-marketplace
 
-Marketplace chứa plugin **`prompt-toolkit`** (v2.6.0): bộ 7 Agent Skills dùng chung cho
+Marketplace chứa plugin **`prompt-toolkit`** (v2.7.0): bộ 7 Agent Skills dùng chung cho
 nhiều coding agent — từ nâng cấp prompt/goal, review read-only, implementation,
 deep reasoning, đến delivery end-to-end và autonomous agent teamwork. Tối ưu output layout
 dễ đọc cho tiếng Việt.
@@ -9,12 +9,12 @@ dễ đọc cho tiếng Việt.
 
 | Plugin | Version | Skills | Mô tả |
 |---|---|---|---|
-| `prompt-toolkit` | 2.6.0 | `ask`, `goal`, `review`, `engineer`, `boost`, `e2e`, `teamwork-preview` | Prompt/goal refinement, read-only audit, engineering có test, deep reasoning, end-to-end delivery, teamwork có duyệt + audit độc lập |
+| `prompt-toolkit` | 2.7.0 | `ask`, `goal`, `review`, `engineer`, `boost`, `e2e`, `teamwork-preview` | Prompt/goal refinement, read-only audit, engineering có test, deep reasoning, end-to-end delivery, teamwork có duyệt + audit độc lập |
 
 | Skill | Làm gì | Kết quả |
 |---|---|---|
 | `ask` | Nghiên cứu context, nâng cấp raw prompt | 1 prompt copy-ready; không thực thi task |
-| `goal` | Làm rõ outcome, scope, success criteria | 1 goal copy-ready; để ngỏ cách làm |
+| `goal` | Làm rõ outcome, scope, success criteria | 1 goal copy-ready + auto-lưu `docs/goal/GOAL_*.txt` |
 | `review` | Audit/diagnose ở chế độ read-only tuyệt đối | Findings có evidence `path:line`; mọi fix đều `NOT APPLIED` |
 | `engineer` | Làm coding task theo Phase 0→4 | Thay đổi nhỏ nhất kèm tests + verification |
 | `boost` | Deep reasoning cho bug khó: hypotheses → investigate → patch → falsify | Root cause có repro test; patch tối thiểu qua adversarial check |

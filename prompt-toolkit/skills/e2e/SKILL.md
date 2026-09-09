@@ -188,10 +188,11 @@ If an unknown permits materially different implementations, requires L4/L5,
 changes auth/permissions/schema, or adds a dependency, ask at most two targeted
 questions and wait. Otherwise state the assumption and continue.
 
-The coordinator owns this stage. If it delegates refinement to a dedicated Ask or
-Goal child, that child must remain non-mutating and its entire response must obey
-the corresponding pure-content contract; reject wrappers, progress commentary, or
-implementation work from that handoff.
+The coordinator owns this stage. If it delegates refinement, an Ask child must
+remain fully non-mutating; a Goal child may additionally persist its result to
+`docs/goal/` per the goal skill (scoped write only) and its response must obey
+the goal output contract (upgraded goal + `Saved:` line). Reject wrappers,
+progress commentary, or implementation work from either handoff.
 
 ## Stage 3 - Engineer (plan and implement)
 
