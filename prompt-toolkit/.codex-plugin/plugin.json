@@ -1,6 +1,6 @@
 {
   "name": "prompt-toolkit",
-  "version": "2.4.1+codex.20260814075500",
+  "version": "2.5.0",
   "description": "Six manual skills for prompt and goal refinement, read-only review, engineering, end-to-end delivery, and coordinator-led agent teamwork.",
   "author": {
     "name": "kai"
