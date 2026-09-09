@@ -1,13 +1,17 @@
 # prompt-toolkit
 
-Bộ 6 Agent Skills dùng chung cho nhiều coding agent, từ nâng
-cấp prompt/goal đến read-only review, implementation và verification end-to-end.
-`teamwork-preview` là Coordinator / Hiring Manager: thiết kế Team Sheet, chờ user
-duyệt, rồi chạy specialist subagents kèm independent verifier/critic. `e2e` tự chọn
-direct execution hoặc compose skill này khi work phức tạp.
+Bộ 7 Agent Skills dùng chung cho nhiều coding agent, từ nâng
+cấp prompt/goal đến read-only review, implementation, deep reasoning và
+verification end-to-end.
+`teamwork-preview` điều phối team autonomous: Sentinel phỏng vấn scoping, chọn
+blueprint (Distributed / Iterative / Long Proof), lập Team Sheet + milestone DAG,
+chờ user duyệt, rồi chạy specialists cách ly kèm Success Auditor độc lập.
+`boost` biến agent thành reasoning engine 3 tầng cho bug khó (investigate
+read-only → patch tối thiểu → adversarial falsification + backtracking).
+`e2e` tự chọn direct execution hoặc compose `teamwork-preview` khi work phức tạp.
 Mỗi skill là một thư mục `SKILL.md` theo
 [Agent Skills open standard](https://agentskills.io/). Cài plugin marketplace nhận
-đủ 6 skill.
+đủ 7 skill.
 
 ## Skills
 
@@ -17,11 +21,14 @@ Mỗi skill là một thư mục `SKILL.md` theo
 | `goal` | Làm rõ outcome, scope và success criteria | Một goal copy-ready; để ngỏ cách thực hiện |
 | `review` | Audit/diagnose code ở chế độ read-only | Findings có evidence; mọi fix đều `NOT APPLIED` |
 | `engineer` | Thực hiện coding task theo Phase 0→4 | Thay đổi nhỏ nhất kèm tests và verification |
+| `boost` | Deep reasoning cho bug khó: hypotheses → investigate → patch → falsify | Root cause có repro test; patch tối thiểu qua adversarial check |
 | `e2e` | Ghép `review → ask → engineer → verify`, có adaptive teamwork | Hoàn thành coding task bằng direct hoặc coordinator-led subagents |
-| `teamwork-preview` | Coordinator thiết kế Team Sheet, duyệt, rồi chạy specialist team | `TEAM_PLAN.md` + artifacts đã verify |
+| `teamwork-preview` | Sentinel + blueprint, Team Sheet + DAG, duyệt, specialists cách ly, Success Auditor | Team Sheet theo template + sign-off `APPROVED` từng milestone |
 
-Tất cả skill đều **manual-only**: chỉ dùng khi user gọi rõ tên skill. Cú pháp gọi
-khác nhau theo host; xem bảng Quick start bên dưới.
+`ask`, `goal`, `review`, `engineer`, `e2e`, `teamwork-preview` là **manual-only**:
+chỉ dùng khi user gọi rõ tên skill. `boost` chạy khi user gọi `/boost` (hoặc nêu
+rõ cần deep thinking / verification chặt) và task khớp mục When to Activate của
+nó. Cú pháp gọi khác nhau theo host; xem bảng Quick start bên dưới.
 
 ## Workflow `e2e`
 
@@ -34,12 +41,12 @@ ask (internal grounded execution brief)
       ↓
 execution gate
    ├── DIRECT: coordinator implements
-   └── TEAMWORK: Team Sheet → user approval → specialists
-          ├── Researcher / Explorer (read-only)
-          ├── Domain Builders (disjoint Owns)
-          └── independent Verifier + Critic/Auditor
+   └── TEAMWORK: scoping → blueprint → Team Sheet + DAG → user approval → specialists
+          ├── Sentinel (orchestrator, sole user-facing)
+          ├── Specialists (disjoint Owns, isolated worktrees)
+          └── Success Auditor per milestone (APPROVED / CHANGES_REQUESTED)
       ↓
-Coordinator synthesizes verified outputs
+Coordinator synthesizes audited outputs
 ```
 
 `e2e` giữ review và upgraded prompt làm internal artifacts, vì vậy user không phải
@@ -48,39 +55,47 @@ kể implementation, L4/L5, schema/auth/permission change hoặc dependency mớ
 
 ### Teamwork mode
 
-`teamwork-preview` là control-plane skill độc lập, bám workflow của folder nguồn
-`teamwork-preview/`: Coordinator thiết kế Team Sheet, user duyệt, rồi launch
-specialists. `e2e` compose skill này khi chọn TEAMWORK. Skill **không** giả lập
+`teamwork-preview` là control-plane skill độc lập, bám lifecycle 4 phase của nó:
+Sentinel phỏng vấn scoping → chọn blueprint → lập Team Sheet + milestone DAG →
+user duyệt → specialists chạy cách ly (worktrees) → Success Auditor sign-off từng
+milestone. `e2e` compose skill này khi chọn TEAMWORK. Skill **không** giả lập
 native command Antigravity và **không** dùng protocol Sentinel/capsule riêng.
 
 Workflow bắt buộc:
 
-1. Assess & decompose — goal một câu, workstream, team tối thiểu 3–6.
-2. Team Sheet — bảng `Role | Specialty | Owns | Inputs | Outputs | Success Criteria`,
-   handoff artifacts, milestones, cảnh báo token/cost. Lưu `TEAM_PLAN.md`.
-3. Approval gate — dừng đến khi user trả lời yes / approve / go, hoặc sửa plan.
-4. Launch — ưu tiên native parallel subagents; nếu host không có, chạy sequential
-   focused sessions với shared files, không nhồi hết context vào Coordinator.
-5. Verification — independent Verifier trước delivery, rồi Critic/Auditor.
-6. Synthesize — Coordinator gộp output đã verify và bàn giao.
+1. Scoping & intake — end state, tech stack, ranh giới kiến trúc, acceptance
+   criteria dạng binary (lệnh build / test / typecheck / lint).
+2. Blueprint — Distributed Coding (shards song song), Iterative Coding
+   (test-driven, phụ thuộc chặt), hoặc Long Proof / Deep Research (thám hiểm
+   phân kỳ + tổng hợp). Xem `skills/teamwork-preview/references/blueprints.md`.
+3. Team Sheet — theo `skills/teamwork-preview/resources/team-sheet-template.md`:
+   roster + scoped paths, milestone DAG + verification gate, cảnh báo token/cost.
+   Lưu `TEAM_PLAN.md`.
+4. Approval gate — dừng đến khi user trả lời yes / approve / go, hoặc sửa plan.
+5. Launch — specialists cách ly (git worktrees/branches, Owns không chồng);
+   ưu tiên native parallel subagents, nếu host không có thì sequential focused
+   sessions, không nhồi hết context vào Sentinel.
+6. Success Audit — Auditor chưa từng viết code cho milestone đó, re-run check từ
+   clean checkout theo `resources/audit-checklist-template.md`; chỉ `APPROVED`
+   mới sang milestone tiếp theo.
 
-Typical roles (chọn động theo task, xem `skills/teamwork-preview/references/example-teams.md`):
+Roles (xem `skills/teamwork-preview/references/roles-governance.md`):
 
 | Role | Trách nhiệm |
 |---|---|
-| Coordinator / Orchestrator | Plan, handoffs, synthesis; không làm thay toàn bộ team |
-| Researcher / Explorer | Unknowns, APIs, docs, prior art |
-| Domain Builders / Workers (1–4) | Implement theo component, Owns không chồng |
-| Verifier / QA | Tests, edge cases, correctness |
-| Critic / Auditor | Adversarial review, anti-patterns, false claims |
+| Sentinel (Orchestrator) | Plan, DAG, handoffs, synthesis; agent duy nhất chat milestone với user |
+| Specialist Workers | Implement trong worktree/scope được giao; giao tiếp bằng deliverables có cấu trúc |
+| Critic / Quality Gate | Peer review conventions, style, type safety trước khi trình Auditor |
+| Success Auditor | Cổng verify độc lập; `APPROVED` / `CHANGES_REQUESTED`, không repair |
 
 Guardrails:
 
 - Task đơn giản: nói rõ và làm bình thường; không ép team.
-- Không bỏ cổng duyệt hoặc bước independent verification.
-- Không để một agent làm hết dưới nhiều tên.
-- Owns không chồng để tránh merge conflict.
-- Specialist chỉ nhận role brief + artifact liên quan; output ghi file chia sẻ.
+- Không bỏ cổng duyệt hoặc bước Success Audit.
+- Không để một agent vừa build vừa audit cùng milestone dưới nhiều tên.
+- Owns không chồng để tránh merge conflict; specialists không sửa shared config
+  khi chưa có Sentinel duyệt.
+- Specialist chỉ nhận dispatch + artifact liên quan; output ghi file chia sẻ.
 - Native `/teamwork-preview` của Antigravity nếu đã sở hữu session thì reuse; không
   mở team thứ hai.
 
@@ -114,6 +129,13 @@ Gọi controller skill trực tiếp trên host hỗ trợ namespace hoặc `$sk
 ```text
 /prompt-toolkit:teamwork-preview Xây feature này bằng một team có independent audit.
 $teamwork-preview Xây feature này bằng một team có independent audit.
+```
+
+Deep reasoning cho bug khó:
+
+```text
+/prompt-toolkit:boost Race condition khi 2 worker cùng ghi cache, fix 2 lần vẫn flaky.
+$boost Deadlock khi checkout đồng thời, cần root cause có repro test.
 ```
 
 Với Antigravity, nếu native `/teamwork-preview` đã sở hữu session thì reuse nó và

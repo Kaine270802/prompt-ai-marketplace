@@ -1,4 +1,0 @@
-interface:
-  display_name: "Teamwork Preview"
-  short_description: "Design a Team Sheet and run specialized subagents"
-  default_prompt: "Use $teamwork-preview to design a Team Sheet, get approval, then coordinate specialized subagents with independent verification."

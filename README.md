@@ -1,15 +1,15 @@
 # prompt-ai-marketplace
 
-Marketplace chứa plugin **`prompt-toolkit`** (v2.5.0): bộ 6 Agent Skills dùng chung cho
+Marketplace chứa plugin **`prompt-toolkit`** (v2.6.0): bộ 7 Agent Skills dùng chung cho
 nhiều coding agent — từ nâng cấp prompt/goal, review read-only, implementation,
-đến delivery end-to-end và coordinator-led agent teamwork. Tối ưu output layout
+deep reasoning, đến delivery end-to-end và autonomous agent teamwork. Tối ưu output layout
 dễ đọc cho tiếng Việt.
 
 ## Plugin bên trong
 
 | Plugin | Version | Skills | Mô tả |
 |---|---|---|---|
-| `prompt-toolkit` | 2.5.0 | `ask`, `goal`, `review`, `engineer`, `e2e`, `teamwork-preview` | Prompt/goal refinement, read-only audit, engineering có test, end-to-end delivery, teamwork có duyệt + verify độc lập |
+| `prompt-toolkit` | 2.6.0 | `ask`, `goal`, `review`, `engineer`, `boost`, `e2e`, `teamwork-preview` | Prompt/goal refinement, read-only audit, engineering có test, deep reasoning, end-to-end delivery, teamwork có duyệt + audit độc lập |
 
 | Skill | Làm gì | Kết quả |
 |---|---|---|
@@ -17,11 +17,13 @@ dễ đọc cho tiếng Việt.
 | `goal` | Làm rõ outcome, scope, success criteria | 1 goal copy-ready; để ngỏ cách làm |
 | `review` | Audit/diagnose ở chế độ read-only tuyệt đối | Findings có evidence `path:line`; mọi fix đều `NOT APPLIED` |
 | `engineer` | Làm coding task theo Phase 0→4 | Thay đổi nhỏ nhất kèm tests + verification |
+| `boost` | Deep reasoning cho bug khó: hypotheses → investigate → patch → falsify | Root cause có repro test; patch tối thiểu qua adversarial check |
 | `e2e` | Ghép `review → ask → engineer → verify` | Task hoàn thành, direct hoặc teamwork |
-| `teamwork-preview` | Coordinator thiết kế Team Sheet, chờ duyệt, chạy specialists | `TEAM_PLAN.md` + artifacts đã verify |
+| `teamwork-preview` | Sentinel + blueprint, Team Sheet + DAG, duyệt, specialists cách ly, Success Auditor | Team Sheet theo template + sign-off `APPROVED` từng milestone |
 
-Tất cả skill đều **manual-only** (`disable-model-invocation: true`): chỉ chạy khi
-bạn gọi rõ tên skill, không auto-trigger.
+`ask`, `goal`, `review`, `engineer`, `e2e`, `teamwork-preview` là **manual-only**
+(`disable-model-invocation: true`): chỉ chạy khi bạn gọi rõ tên skill.
+`boost` chạy khi bạn gọi `/boost` hoặc nêu rõ cần deep thinking / verification chặt.
 
 ## Cài nhanh
 

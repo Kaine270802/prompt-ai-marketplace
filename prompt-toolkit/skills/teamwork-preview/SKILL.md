@@ -1,106 +1,98 @@
 ---
 name: teamwork-preview
-description: "Orchestrates a dynamic team of specialized subagents (coordinator + domain specialists + independent verifier/critic) to plan, implement, and quality-check complex tasks in parallel, modeled after Google Antigravity /teamwork-preview. MANUAL-ONLY: use only when the user explicitly invokes /teamwork-preview, /prompt-toolkit:teamwork-preview, or $teamwork-preview, or asks to use the prompt-toolkit teamwork-preview skill."
-disable-model-invocation: true
+description: Orchestrates an autonomous team of specialized AI agents based on task blueprints (Distributed Coding, Iterative Coding, Deep Research/Long Proof) for long-horizon, multi-step, repository-wide projects with independent Success Auditor verification. Use when a project spans multiple subsystems, requires hours of autonomous execution, or benefits from parallel specialist subagents working towards defined milestones.
 ---
 
-# Teamwork Preview
+# Teamwork: Autonomous Multi-Agent Teams
 
-Act as a Coordinator / Hiring Manager that designs and runs specialized Agent Teams
-for complex work. Inspired by Google Antigravity Agent Teams (`/teamwork-preview`).
+The **Teamwork** skill coordinates an autonomous team of specialized subagents to tackle long-horizon, multi-step engineering projects. It structures work through blueprint selection, milestone decomposition, role specialization, and independent audit gates.
 
-This plugin skill is the Team Sheet workflow below. It does not replace or impersonate
-Antigravity's native `/teamwork-preview` command. If that native controller already
-owns the session, reuse it and apply this workflow as the team's operating plan;
-never start a second team.
+---
 
-Read [`references/example-teams.md`](references/example-teams.md) before designing
-roles. Adapt those sheets; do not copy them blindly.
+## When to Activate This Skill
 
-## When to Use
+Activate this skill when:
+- Executing **repository-wide migrations** (e.g. migrating from Vue 2 to Vue 3, CommonJS to ESM, React class components to hooks).
+- Building **complete subsystems or full-stack features** spanning multiple directories, APIs, and database schemas.
+- Conducting **deep technical research** involving multi-branch strategy exploration and proof synthesis.
+- The user explicitly mentions `/teamwork-preview`, autonomous agent teams, or asks for a structured team approach.
 
-Activate only when:
-- Task has clear parallelizable workstreams or multiple domains of expertise
-- Single-agent context would bloat or quality would suffer without independent verification
-- User explicitly asks for teamwork, agent teams, multi-agent, or /teamwork-preview style process
+---
 
-If the task is simple, say so and handle it normally. Never force a team on trivial work.
+## Lifecycle & Operational Workflow
 
-## Core Workflow
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Dev as Developer
+    participant Sentinel as Sentinel (Project Lead)
+    participant TeamSheet as Team Sheet & DAG Plan
+    participant Specialists as Specialist Subagents
+    participant Auditor as Success Auditor
 
-### 1. Assess & Decompose
-- Restate the high-level goal in one sentence.
-- Break into independent or loosely-coupled workstreams.
-- Identify required expertise, dependencies, risks, and success criteria.
-- Decide the minimal sufficient team size (prefer 3–6 specialists total).
+    Dev->>Sentinel: Project Request
+    Sentinel->>Dev: Scoping Interview (Constraints & Invariants)
+    Sentinel->>TeamSheet: Generate Team Sheet & Milestone DAG
+    TeamSheet-->>Dev: Present Team Sheet for Review
+    Dev->>Sentinel: Approve Plan
+    
+    loop For Each Milestone
+        Sentinel->>Specialists: Dispatch parallel tasks (Isolated Worktrees)
+        Specialists->>Specialists: Code, Test, Refactor
+        Specialists->>Auditor: Submit Workstream Artifacts
+        Auditor->>Auditor: Independent Verification against Acceptance Criteria
+        alt Audit Fails
+            Auditor->>Specialists: Issue Actionable Correction Notice
+        else Audit Passes
+            Auditor->>Sentinel: Sign off Milestone
+            Sentinel->>Dev: Report Milestone Completion
+        end
+    end
+    Sentinel-->>Dev: Final Project Handover
+```
 
-### 2. Design the Team Sheet (Artifact)
-Produce a clean Markdown Team Sheet containing:
+Follow this 4-phase execution lifecycle:
 
-**Goal summary**
+### Phase 1: Scoping & Intake Interview (Sentinel)
+Before spawning any worker agents, act as or designate the **`Sentinel`**:
+1. **Clarify Objectives**: Understand the end state, target tech stack, and non-negotiable architectural boundaries.
+2. **Determine Blueprint**: Select the optimal execution pattern (see [references/blueprints.md](./references/blueprints.md)):
+   - **Distributed Coding**: For decomposable, parallelizable engineering tasks.
+   - **Iterative Coding**: For tightly coupled, test-driven implementations.
+   - **Long Proof / Deep Research**: For open-ended research, benchmarking, and multi-hypothesis evaluation.
+3. **Capture Acceptance Criteria**: Define exact binary completion tests (build commands, linters, coverage targets).
 
-**Roles table** (use this exact structure):
+### Phase 2: Team Sheet Generation & DAG Decomposition
+Create a formal **Team Sheet** before touching any production files:
+- Use [resources/team-sheet-template.md](./resources/team-sheet-template.md) to define:
+  - **Specialist Roles**: Exactly what agents are deployed (e.g. Backend Engineer, Frontend Specialist, Migration Worker).
+  - **Milestone DAG**: Directed Acyclic Graph of dependencies, ensuring blockers are solved first.
+  - **Review Gates**: Specific deliverables and checks required per milestone.
+- **Stop for Developer Approval**: Present the Team Sheet and obtain explicit confirmation before proceeding to execution.
 
-| Role | Specialty | Owns | Inputs | Outputs | Success Criteria |
-|------|-----------|------|--------|---------|------------------|
-| ...  | ...       | ...  | ...    | ...     | ...              |
+### Phase 3: Autonomous Parallel Execution
+Once approved:
+1. **Isolate Workspaces**: Execute work across separate Git branches or worktrees (`git worktree add`) to prevent concurrent file conflicts.
+2. **Assign Specialist Subagents**: Dispatch subagents (`invoke_subagent`) equipped with targeted roles and scoped file access.
+3. **Cross-Agent Communication**: Specialists share progress via structured artifacts and message queues without flooding the primary user chat.
 
-Typical roles (choose and adapt dynamically):
-- Coordinator / Orchestrator (you) — owns overall plan, handoffs, final synthesis
-- Researcher / Explorer — unknowns, APIs, docs, prior art
-- Domain Builders / Workers (1–4 parallel) — specialized by component (frontend, backend, infra, data, systems, etc.)
-- Verifier / QA — tests, edge cases, correctness
-- Critic / Auditor — adversarial review, anti-patterns, security, style, "did we actually solve it?"
+### Phase 4: Independent Success Audit
+A dedicated **`Success Auditor`** must independently review every completed milestone:
+- The `Success Auditor` has **NEVER written code** for this milestone (guaranteeing impartiality).
+- Evaluates code against [resources/audit-checklist-template.md](./resources/audit-checklist-template.md).
+- Only when the Auditor signs off does the Sentinel advance to the next milestone in the DAG.
 
-Also include:
-- Handoff protocol (shared artifact locations, e.g. `TEAM_STATE.md`, role-specific output files)
-- Milestone sequence and which tracks can run in parallel
-- Explicit token / cost warning for large teams
+---
 
-Save the Team Sheet persistently as `TEAM_PLAN.md` (or equivalent) for continuity across context resets.
+## Governance & Resource Management
 
-### 3. Present for Approval (Mandatory Gate)
-Show the full Team Sheet + high-level milestones clearly.
-Ask: "Approve this team plan? Reply yes / approve / go, or give modifications."
-Do **not** proceed until the user gives explicit approval. Iterate the plan if they request changes.
+- **Context Isolation**: Always maintain clean contexts by delegating heavy tasks to subagents and reporting back high-level summaries.
+- **Early Termination**: The Sentinel must pause and request guidance if an unresolvable blocker or major design ambiguity is discovered during execution.
 
-### 4. Launch & Coordinate
-On approval:
-- Prefer native dynamic subagents / parallel agents if the host platform supports them (Cursor Task, Copilot agent mode, Antigravity, etc.). Use asynchronous task management when available so the Coordinator can continue while builders work.
-- Otherwise simulate with sequential focused sessions: each "subagent" receives only its role prompt + relevant artifacts; write outputs to shared files; never let the main context accumulate everything.
-- Give every specialist a self-contained role brief: goal, Owns, Inputs, Outputs, Success Criteria, and the shared artifact paths from the Team Sheet. Do not assume a child can see this conversation.
-- Enforce single responsibility. Re-dispatch or respawn on blockers.
-- Keep progress visible via shared markdown artifacts.
-- If a long-running role approaches context limits, summarize state and self-succeed into a fresh instance of the same role.
+---
 
-### 5. Verification Loop (Non-negotiable)
-- Independent Verifier must run before final delivery.
-- Critic / Auditor challenges assumptions and looks for cheating, hardcoding, incomplete coverage, or false claims of success.
-- Only synthesize the final result after clean verification.
-
-### 6. Synthesize & Hand Over
-- Coordinator merges verified outputs.
-- Deliver: final artifacts, short walkthrough of what each role contributed, remaining risks / TODOs, and how to iterate.
-- Always respond to the user in the same language they used.
-
-## Best Practices
-
-- Minimal sufficient team — more agents ≠ better.
-- Never pollute main context; offload aggressively to subagents or files.
-- Prefer verification and adversarial review over optimism.
-- Log key decisions and rationale in shared state.
-- Warn the user early about high token usage on large or deeply parallel teams.
-
-## Anti-patterns to Avoid
-
-- Letting one agent do everything under different names
-- Skipping the approval gate or the independent verification step
-- Overlapping ownership that creates merge conflicts
-- Hardcoding, mocking, or claiming success without evidence
-- Creating teams for tasks that a single focused agent can handle cleanly
-
-## Example Role Sets
-
-See `references/example-teams.md` for concrete Team Sheet examples (full-stack web app, systems component, research + code, data pipeline).
-
-When in doubt, start smaller, get approval, and expand only if verification fails.
+## Quick Reference Links
+- [Blueprints & Execution Patterns](./references/blueprints.md)
+- [Roles & Team Governance](./references/roles-governance.md)
+- [Team Sheet Template](./resources/team-sheet-template.md)
+- [Success Audit Checklist Template](./resources/audit-checklist-template.md)
