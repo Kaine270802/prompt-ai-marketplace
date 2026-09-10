@@ -17,12 +17,12 @@ Mỗi skill là một thư mục `SKILL.md` theo
 
 | Skill | Chức năng | Kết quả |
 |---|---|---|
-| `ask` | Nghiên cứu context và nâng cấp raw prompt | Một prompt copy-ready; không thực thi task |
+| `ask` | Tư vấn read-only: audit, chẩn đoán, so phương án A/B, blueprint text | Báo cáo tư vấn đầy đủ; không sửa code |
 | `goal` | Làm rõ outcome, scope và success criteria | Một goal copy-ready + auto-lưu `docs/goal/GOAL_*.txt`; để ngỏ cách thực hiện |
-| `review` | Audit/diagnose code ở chế độ read-only | Findings có evidence; mọi fix đều `NOT APPLIED` |
-| `engineer` | Thực hiện coding task theo Phase 0→4 | Thay đổi nhỏ nhất kèm tests và verification |
+| `review` | Audit read-only: scope, đa chiều, triage 🔴🟡🔵, roadmap khắc phục | Báo cáo audit có cấu trúc; chỉ dẫn text, không sửa code |
+| `engineer` | Thực thi task (nuốt Goal Prompt/blueprint/roadmap), retry ≤3 + rollback + chốt xác minh | Thay đổi nhỏ nhất kèm tests và verification |
 | `boost` | Deep reasoning cho bug khó: hypotheses → investigate → patch → falsify | Root cause có repro test; patch tối thiểu qua adversarial check |
-| `e2e` | Ghép `review → ask → engineer → verify`, có adaptive teamwork | Hoàn thành coding task bằng direct hoặc coordinator-led subagents |
+| `e2e` | Ghép `review → ask → goal → engineer → verify`, có adaptive teamwork | Hoàn thành coding task bằng direct hoặc coordinator-led subagents |
 | `teamwork-preview` | Sentinel + blueprint, Team Sheet + DAG, duyệt, specialists cách ly, Success Auditor | Team Sheet theo template + sign-off `APPROVED` từng milestone |
 
 `ask`, `goal`, `review`, `engineer`, `e2e`, `teamwork-preview` là **manual-only**:
@@ -35,22 +35,24 @@ nó. Cú pháp gọi khác nhau theo host; xem bảng Quick start bên dưới.
 ```text
 raw user prompt
       ↓
-review (read-only evidence + root cause)
+review (scope + 4-dimension audit + triage + roadmap)
       ↓
-ask (internal grounded execution brief)
+ask (consulting report: diagnosis + options A/B + text blueprint)
+      ↓
+goal (GOAL file: decomposition + budgets + gates — the execution contract)
       ↓
 execution gate
-   ├── DIRECT: coordinator implements
+   ├── DIRECT: coordinator implements per GOAL file
    └── TEAMWORK: scoping → blueprint → Team Sheet + DAG → user approval → specialists
           ├── Sentinel (orchestrator, sole user-facing)
           ├── Specialists (disjoint Owns, isolated worktrees)
           └── Success Auditor per milestone (APPROVED / CHANGES_REQUESTED)
       ↓
-Coordinator synthesizes audited outputs
+Layer-3 final gate → Coordinator synthesizes audited outputs
 ```
 
-`e2e` giữ review và upgraded prompt làm internal artifacts, vì vậy user không phải
-copy prompt qua ba agent. Skill chỉ dừng để hỏi khi có ambiguity làm thay đổi đáng
+`e2e` giữ review, consulting brief và GOAL file làm internal artifacts, vì vậy user không phải
+copy prompt qua các agent. Skill chỉ dừng để hỏi khi có ambiguity làm thay đổi đáng
 kể implementation, L4/L5, schema/auth/permission change hoặc dependency mới.
 
 ### Teamwork mode

@@ -1,6 +1,6 @@
 # prompt-ai-marketplace
 
-Marketplace chứa plugin **`prompt-toolkit`** (v2.7.0): bộ 7 Agent Skills dùng chung cho
+Marketplace chứa plugin **`prompt-toolkit`** (v2.8.0): bộ 7 Agent Skills dùng chung cho
 nhiều coding agent — từ nâng cấp prompt/goal, review read-only, implementation,
 deep reasoning, đến delivery end-to-end và autonomous agent teamwork. Tối ưu output layout
 dễ đọc cho tiếng Việt.
@@ -9,16 +9,16 @@ dễ đọc cho tiếng Việt.
 
 | Plugin | Version | Skills | Mô tả |
 |---|---|---|---|
-| `prompt-toolkit` | 2.7.0 | `ask`, `goal`, `review`, `engineer`, `boost`, `e2e`, `teamwork-preview` | Prompt/goal refinement, read-only audit, engineering có test, deep reasoning, end-to-end delivery, teamwork có duyệt + audit độc lập |
+| `prompt-toolkit` | 2.8.0 | `ask`, `goal`, `review`, `engineer`, `boost`, `e2e`, `teamwork-preview` | Prompt/goal refinement, read-only audit, engineering có test, deep reasoning, end-to-end delivery, teamwork có duyệt + audit độc lập |
 
 | Skill | Làm gì | Kết quả |
 |---|---|---|
-| `ask` | Nghiên cứu context, nâng cấp raw prompt | 1 prompt copy-ready; không thực thi task |
+| `ask` | Tư vấn read-only: audit, chẩn đoán, so phương án A/B, blueprint text | Báo cáo tư vấn đầy đủ; không sửa code |
 | `goal` | Làm rõ outcome, scope, success criteria | 1 goal copy-ready + auto-lưu `docs/goal/GOAL_*.txt` |
-| `review` | Audit/diagnose ở chế độ read-only tuyệt đối | Findings có evidence `path:line`; mọi fix đều `NOT APPLIED` |
-| `engineer` | Làm coding task theo Phase 0→4 | Thay đổi nhỏ nhất kèm tests + verification |
+| `review` | Audit read-only: scope, đa chiều, triage 🔴🟡🔵, roadmap khắc phục | Báo cáo audit có cấu trúc; chỉ dẫn text, không sửa code |
+| `engineer` | Thực thi task (nuốt Goal Prompt/blueprint/roadmap), retry ≤3 + rollback + chốt xác minh | Thay đổi nhỏ nhất kèm tests + verification |
 | `boost` | Deep reasoning cho bug khó: hypotheses → investigate → patch → falsify | Root cause có repro test; patch tối thiểu qua adversarial check |
-| `e2e` | Ghép `review → ask → engineer → verify` | Task hoàn thành, direct hoặc teamwork |
+| `e2e` | Ghép `review → ask → goal → engineer → verify` (GOAL file làm hợp đồng) | Task hoàn thành, direct hoặc teamwork |
 | `teamwork-preview` | Sentinel + blueprint, Team Sheet + DAG, duyệt, specialists cách ly, Success Auditor | Team Sheet theo template + sign-off `APPROVED` từng milestone |
 
 `ask`, `goal`, `review`, `engineer`, `e2e`, `teamwork-preview` là **manual-only**
@@ -74,12 +74,12 @@ cp -R ./prompt-toolkit/skills/* <skills-dir-cua-host>/
 - **Đào sâu vấn đề thực:** `ask`/`goal` suy luận intent ẩn, tách OUTCOME khỏi OUTPUT;
   `review`/`engineer` rank nỗi đau theo user-impact, chạy 5-Whys silent, chốt bằng
   `Assumption` + pre-mortem 1 dòng. Depth-probe ≤1 vòng, placeholder ≤3.
-- **An toàn theo thiết kế:** `review` read-only tuyệt đối (mọi fix là proposal
-  `NOT APPLIED`); `engineer` mặc định CHECK MODE khi xem trước, chỉ sửa khi có
+- **An toàn theo thiết kế:** `review` read-only tuyệt đối (mọi can thiệp chỉ là
+  chỉ dẫn text, không bao giờ thực thi); `engineer` mặc định CHECK MODE khi xem trước, chỉ sửa khi có
   `/engineer` + approve; không tự thêm dependency, đổi auth/permission hay phá
   contract khi chưa được duyệt.
-- **Layout tiếng Việt dễ quét:** câu ngắn, ý chính đầu câu, kết quả `review`/`engineer`
-  render theo heading `## 1..8` + bảng file checklist, mọi claim cite `path:line`.
+- **Layout tiếng Việt dễ quét:** câu ngắn, ý chính đầu câu, kết quả render theo
+  heading `##` + bảng, mọi claim cite `path:line`.
 - **Teamwork có kỷ luật:** Team Sheet `Role | Specialty | Owns | Inputs | Outputs |
   Success Criteria`, cổng duyệt bắt buộc (yes/approve/go), Verifier độc lập rồi mới
   tới Critic/Auditor. Task đơn giản thì làm thẳng, không ép team.

@@ -1,6 +1,6 @@
 ---
 name: e2e
-description: "Adaptive end-to-end coding workflow that turns a user's raw request into a verified implementation through isolated review, prompt refinement, engineering, independent verification, and coordinator-led teamwork for complex work. MANUAL-ONLY: use only when the user explicitly invokes /e2e, /prompt-toolkit:e2e, or $e2e. The argument is the coding task to complete."
+description: "Adaptive end-to-end coding workflow that turns a user's raw request into a verified implementation through isolated review, consulting, goal-prompt contracting, engineering, independent verification, and coordinator-led teamwork for complex work. MANUAL-ONLY: use only when the user explicitly invokes /e2e, /prompt-toolkit:e2e, or $e2e. The argument is the coding task to complete."
 disable-model-invocation: true
 ---
 
@@ -11,7 +11,7 @@ disable-model-invocation: true
 Treat the text supplied with `e2e` as the coding task to complete. Carry it from
 evidence-based review to a tested implementation in one continuous workflow:
 
-`user prompt -> review -> ask -> engineer -> verify`
+`user prompt -> review -> ask -> goal -> engineer -> verify`
 
 Run that pipeline either directly or through a coordinator-led team. Teamwork is how
 the pipeline is staffed, not a replacement for any stage contract. When a team is
@@ -20,7 +20,7 @@ selection, Team Sheet + milestone DAG, user approval, isolated specialists, then
 Success Auditor sign-off per milestone. Do not invent a second
 controller protocol inside this skill.
 
-Do not merely return an upgraded prompt. Complete the requested work unless a stop
+Do not merely return a consulting report. Complete the requested work unless a stop
 condition requires user input.
 
 ## Non-negotiable rules
@@ -48,14 +48,17 @@ condition requires user input.
 
 ## Stage isolation
 
-The `review` stage is strictly read-only; later stages may edit only after the
-review artifact is complete. Do not activate a separate session-wide read-only
-contract that would make the engineering stage impossible. Instead, reproduce the
-review discipline inside Stage 1 and explicitly transition to mutation only in
-Stage 3.
+The `review` and `ask` stages are strictly read-only; the `goal` stage may write
+ONLY `docs/goal/GOAL_*.txt`; later stages may edit product code only after the
+GOAL file (the execution contract) is complete. Do not activate a separate
+session-wide read-only contract that would make the engineering stage impossible.
+Instead, reproduce the read-only discipline inside Stages 1–2, allow the single
+scoped GOAL write in Stage 3, and explicitly transition to mutation only in
+Stage 4.
 
-Keep the Stage 1 review and Stage 2 upgraded execution brief as internal working
-artifacts. Do not ask the user to copy a prompt between agents.
+Keep the Stage 1 Evidence Brief, Stage 2 consulting brief, and Stage 3 GOAL file
+as internal working artifacts (the GOAL file path is reported in the final
+response). Do not ask the user to copy artifacts between agents.
 
 A Researcher / Explorer is read-only: it must not edit product files, run mutating
 commands, install anything, or alter configuration. In a teamwork tier, role
@@ -148,18 +151,19 @@ worktrees per
 
 ## Stage 1 - Review (read-only)
 
-Do not modify files during this stage.
+Do not modify files during this stage. Reproduce the `review` skill: isolate the
+scope (module / feature / latest diff), audit on all 4 dimensions
+(logic & security, performance, architecture, maintainability) with `path:line`
+evidence, triage every finding (🔴 BLOCKER / 🟡 WARNING / 🔵 NITPICK), and draft
+the remediation roadmap (blocker-first order).
 
 Create an internal Evidence Brief containing:
 
-- the request mapped to actual entry points, symbols, and test files;
-- expected state versus actual state for bugs;
-- one root-cause sentence classified as `logic`, `state`, `type`, `resource`,
-  `config`, `concurrency`, or `dependency`;
-- affected layers and contracts for features;
-- existing conventions and reusable code;
-- risks, contradictions, missing evidence, and likely regression surface;
-- exact file citations for every codebase claim.
+- the scope (module / feature / diff range) and exact files inspected;
+- findings grouped by dimension with severity tags and evidence;
+- the 🔴 list (must-fix) in dependency order plus top 🟡 items;
+- caller/impact map, existing conventions and reusable code;
+- risks, contradictions, missing evidence, and likely regression surface.
 
 If evidence contradicts the user's premise, report the contradiction and stop for
 direction when it materially changes the implementation. Do not manufacture work
@@ -172,37 +176,55 @@ files, objective, invariants, acceptance criteria). The Coordinator (Sentinel) m
 re-open cited files, resolve conflicting findings, and synthesize one Evidence
 Brief. Do not accept a specialist summary as proof.
 
-## Stage 2 - Ask (refine the execution brief)
+## Stage 2 - Ask (consulting direction, read-only)
 
-Silently convert the raw request and Evidence Brief into a concise, grounded
-Execution Brief for the engineering stage:
+Do not modify files during this stage. Reproduce the `ask` skill on the Evidence
+Brief: confirm the diagnosis, derive options A (minimal) vs B (architectural),
+score the trade-off matrix, and commit to a direction (A, B, or "A now, B later")
+with the text-only blueprint (ordered steps, target files, gotchas).
 
-- preserve the user's intent, language, constraints, code, data, and examples;
-- replace vague references with verified paths, symbols, and contracts;
-- specify scope, definition of done, failure modes, edge cases, and test locations;
-- identify existing code to reuse and changes that are explicitly out of scope;
-- do not invent requirements or over-prescribe implementation details;
-- use at most three `[[CONFIRM: ...]]` placeholders for non-blocking unknowns.
+The direction + blueprint feed Stage 3 — they are working artifacts, not the
+final answer. If the evidence contradicts the user's premise, report the
+contradiction and stop for direction when it materially changes the
+implementation. Do not manufacture work when no change is needed.
 
-If an unknown permits materially different implementations, requires L4/L5,
-changes auth/permissions/schema, or adds a dependency, ask at most two targeted
-questions and wait. Otherwise state the assumption and continue.
+The coordinator owns this stage. If it delegates, an Ask child stays strictly
+read-only and returns a consulting report (diagnosis + options + text-only
+blueprint, no edits). Reject wrappers, progress commentary, or implementation
+work from that handoff. If an unknown permits materially different
+implementations, requires L4/L5, changes auth/permissions/schema, or adds a
+dependency, ask at most two targeted questions and wait. Otherwise state the
+assumption and continue.
 
-The coordinator owns this stage. If it delegates refinement, an Ask child must
-remain fully non-mutating; a Goal child may additionally persist its result to
-`docs/goal/` per the goal skill (scoped write only) and its response must obey
-the goal output contract (upgraded goal + `Saved:` line). Reject wrappers,
-progress commentary, or implementation work from either handoff.
+## Stage 3 - Goal (execution contract, scoped write only)
 
-## Stage 3 - Engineer (plan and implement)
+The ONLY write allowed in this stage is `docs/goal/GOAL_*.txt`. Reproduce the
+`goal` skill: convert the direction + blueprint into a Goal Prompt and persist it
+per the goal naming rules (`GOAL_<YYYY-MM-DD>_<n>_<slug>.txt`, never overwrite).
+For codebase-intervention tasks the GOAL file MUST contain the 4-part structure:
+role, Layer-1 decomposition (sub-goals in dependency order), Layer-2 loop
+(4 phases, ≤3 retries, circuit breaker with rollback scope), and the Layer-3
+final gate. This file is THE execution contract — later stages obey its order,
+budgets, and gates (they may tighten, never loosen).
+
+The coordinator owns this stage. If it delegates, a Goal child may write ONLY
+`docs/goal/GOAL_*.txt` and its response must obey the goal output contract
+(upgraded goal + completion line). Reject wrappers, progress commentary, or
+implementation work from that handoff.
+
+## Stage 4 - Engineer (plan and implement)
 
 1. Present a compressed plan before editing: impact level, exact file paths,
-   one-line intent per file, estimated diff size, and test strategy.
+   one-line intent per file, estimated diff size, test strategy, plus the budgets
+   adopted from the GOAL file (retries ≤3, rollback scope).
 2. For L3+, name the feature flag or versioning strategy. For database changes,
    provide both up and down migrations and wait for approval.
 3. Confirm imports resolve, naming matches neighboring code, no duplicate utility
    exists, and project-native error types are used.
-4. Apply the minimum edit needed to satisfy the Execution Brief.
+4. Apply the minimum edit needed to satisfy the GOAL file, following its
+   Layer-1 order and Layer-2 loop (verify failed below 3 attempts → change
+   approach and retry; attempts reaching 3 → roll back this change only, stop,
+   and report the blockage).
 5. Validate and sanitize boundary inputs, use parameterized queries, avoid secrets
    or PII in code/logs, and preserve least privilege.
 6. Follow existing observability conventions for new external calls and new error
@@ -230,7 +252,7 @@ In a teamwork tier (Coordinator acting as Sentinel):
    reject overlapping ownership before verification. Preserve unrelated
    pre-existing changes.
 
-## Stage 4 - Verify and repair
+## Stage 5 - Verify and repair
 
 Close implementation before starting final verification. Run the narrowest relevant
 checks first, then broader project checks when available:
@@ -239,6 +261,12 @@ checks first, then broader project checks when available:
 2. typecheck or build;
 3. lint/format validation;
 4. relevant integration or end-to-end test.
+
+Then run the Layer-3 final gate from the GOAL file: re-check results against the
+original request, run the real build + FULL suite, review the git diff against
+the Stage 0 baseline, remove debug logs and temp files, and run one realistic
+end-to-end scenario. Integration failure here → at most ONE fix attempt; still
+failing → stop and report the integration conflict.
 
 In a teamwork tier, the Success Audit from `teamwork-preview` is non-negotiable.
 A dedicated Success Auditor signs off every milestone using
@@ -287,7 +315,7 @@ clear.
   are internal artifacts.
 - Show unified diff hunks only when displaying partial code changes; never dump a
   whole file for a small edit.
-- Keep internal Evidence Brief and Execution Brief out of the final response unless
+- Keep internal Evidence Brief, consulting brief, and GOAL file out of the final response unless
   the user asks for them.
 
 Use this final structure, collapsing empty sections and QUICK work when sensible:
@@ -297,7 +325,8 @@ Use this final structure, collapsing empty sections and QUICK work when sensible
 
 ## 2. Context
 Exact files inspected; DIRECT or blueprint + Team Sheet roles used, with the
-`TEAM_PLAN.md` path when a team ran.
+`TEAM_PLAN.md` path when a team ran, and the GOAL file path
+(`docs/goal/GOAL_*.txt`) always.
 
 ## 3. Diagnosis / Design
 No more than five bullets.

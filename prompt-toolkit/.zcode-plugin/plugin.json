@@ -1,6 +1,6 @@
 {
   "name": "prompt-toolkit",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "description": "Bộ 7 skill cho prompt/goal refinement, read-only review, engineering, delivery end-to-end và coordinator-led agent teamwork.",
   "author": {
     "name": "kai"
