@@ -1,6 +1,6 @@
 ---
-name: review
-description: "Strict read-only audit: scope discovery, 4-dimension audit (logic/security, performance, architecture, maintainability), severity triage, and remediation roadmap with text-only guidance. Never edits code. MANUAL-ONLY: do not auto-trigger; use only when the user explicitly invokes /review (or /prompt-toolkit:review)."
+name: k-review
+description: "Strict read-only audit: scope discovery, 4-dimension audit (logic/security, performance, architecture, maintainability), severity triage, and remediation roadmap with text-only guidance. Never edits code. MANUAL-ONLY: do not auto-trigger; use only when the user explicitly invokes /k-review (or /prompt-toolkit:k-review)."
 disable-model-invocation: true
 ---
 

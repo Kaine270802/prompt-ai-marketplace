@@ -1,5 +1,5 @@
 ---
-name: teamwork-preview
+name: k-teamwork-preview
 description: Orchestrates an autonomous team of specialized AI agents based on task blueprints (Distributed Coding, Iterative Coding, Deep Research/Long Proof) for long-horizon, multi-step, repository-wide projects with independent Success Auditor verification. Use when a project spans multiple subsystems, requires hours of autonomous execution, or benefits from parallel specialist subagents working towards defined milestones.
 ---
 
@@ -15,7 +15,7 @@ Activate this skill when:
 - Executing **repository-wide migrations** (e.g. migrating from Vue 2 to Vue 3, CommonJS to ESM, React class components to hooks).
 - Building **complete subsystems or full-stack features** spanning multiple directories, APIs, and database schemas.
 - Conducting **deep technical research** involving multi-branch strategy exploration and proof synthesis.
-- The user explicitly mentions `/teamwork-preview`, autonomous agent teams, or asks for a structured team approach.
+- The user explicitly mentions `/k-teamwork-preview`, autonomous agent teams, or asks for a structured team approach.
 
 ---
 

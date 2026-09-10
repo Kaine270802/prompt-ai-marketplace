@@ -1,5 +1,5 @@
 ---
-name: boost
+name: k-boost
 description: Triggers deep reasoning, multi-agent hypothesis generation, root-cause investigation, and adversarial verification for complex software engineering problems, race conditions, concurrency bugs, algorithmic challenges, and non-trivial refactoring. Use when a coding task is too complex for single-turn code generation or requires systematic debugging and proof of correctness.
 ---
 
@@ -15,7 +15,7 @@ Activate this skill when:
 - Resolving **flaky tests**, **race conditions**, **memory leaks**, or **deadlocks**.
 - Tackling non-trivial **algorithmic optimizations** or architectural refactoring.
 - Debugging complex errors where initial fixes repeatedly fail or produce regressions.
-- The user explicitly requests deep thinking, rigorous verification, or mentions `/boost`.
+- The user explicitly requests deep thinking, rigorous verification, or mentions `/k-boost`.
 
 ---
 

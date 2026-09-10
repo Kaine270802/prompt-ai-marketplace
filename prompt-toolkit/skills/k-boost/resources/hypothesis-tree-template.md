@@ -1,6 +1,6 @@
 # Hypothesis Tree Template
 
-Use this document to track investigation hypotheses, evidence, and verification statuses during a `/boost` session.
+Use this document to track investigation hypotheses, evidence, and verification statuses during a `/k-boost` session.
 
 ---
 

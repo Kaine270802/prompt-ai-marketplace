@@ -1,4 +1,0 @@
-interface:
-  display_name: "End-to-End Team Engineer"
-  short_description: "Review, implement, and verify; team via Team Sheet"
-  default_prompt: "Use $e2e to complete this coding request. For complex work, design a Team Sheet, get approval, then implement with independent verification."

@@ -1,21 +1,21 @@
 ---
-name: e2e
-description: "Adaptive end-to-end coding workflow that turns a user's raw request into a verified implementation through isolated review, consulting, goal-prompt contracting, engineering, independent verification, and coordinator-led teamwork for complex work. MANUAL-ONLY: use only when the user explicitly invokes /e2e, /prompt-toolkit:e2e, or $e2e. The argument is the coding task to complete."
+name: k-e2e
+description: "Adaptive end-to-end coding workflow that turns a user's raw request into a verified implementation through isolated review, consulting, goal-prompt contracting, engineering, independent verification, and coordinator-led teamwork for complex work. MANUAL-ONLY: use only when the user explicitly invokes /k-e2e, /prompt-toolkit:k-e2e, or $k-e2e. The argument is the coding task to complete."
 disable-model-invocation: true
 ---
 
-> **[RÀNG BUỘC ĐẦU PHIÊN — CHECK MODE MẶC ĐỊNH: KHÔNG EDIT FILE/CODE.]** Mặc định khi kiểm tra/xem trước skill này: chỉ đọc (Read/Grep/Glob, `git diff/status` read-only) + đề xuất, không gọi Edit/Write. Chỉ khi user gọi rõ `/e2e` kèm task và không có cờ [KHÔNG EDIT] mới được chạy pipeline và sửa theo các Stage dưới đây.
+> **[RÀNG BUỘC ĐẦU PHIÊN — CHECK MODE MẶC ĐỊNH: KHÔNG EDIT FILE/CODE.]** Mặc định khi kiểm tra/xem trước skill này: chỉ đọc (Read/Grep/Glob, `git diff/status` read-only) + đề xuất, không gọi Edit/Write. Chỉ khi user gọi rõ `/k-e2e` kèm task và không có cờ [KHÔNG EDIT] mới được chạy pipeline và sửa theo các Stage dưới đây.
 
 # End-to-End Engineering Workflow
 
 Treat the text supplied with `e2e` as the coding task to complete. Carry it from
 evidence-based review to a tested implementation in one continuous workflow:
 
-`user prompt -> review -> ask -> goal -> engineer -> verify`
+`user prompt -> k-review -> k-ask -> k-goal -> k-engineer -> verify`
 
 Run that pipeline either directly or through a coordinator-led team. Teamwork is how
 the pipeline is staffed, not a replacement for any stage contract. When a team is
-selected, compose the sibling `teamwork-preview` skill: scoping interview, blueprint
+selected, compose the sibling `k-teamwork-preview` skill: scoping interview, blueprint
 selection, Team Sheet + milestone DAG, user approval, isolated specialists, then
 Success Auditor sign-off per milestone. Do not invent a second
 controller protocol inside this skill.
@@ -96,9 +96,9 @@ FULL/L3+ work when the host supports it. Do not spawn a team merely because the
 capability exists.
 
 Before launching a team, read
-[`../teamwork-preview/SKILL.md`](../teamwork-preview/SKILL.md),
-[`../teamwork-preview/references/blueprints.md`](../teamwork-preview/references/blueprints.md),
-and [`../teamwork-preview/references/roles-governance.md`](../teamwork-preview/references/roles-governance.md).
+[`../k-teamwork-preview/SKILL.md`](../k-teamwork-preview/SKILL.md),
+[`../k-teamwork-preview/references/blueprints.md`](../k-teamwork-preview/references/blueprints.md),
+and [`../k-teamwork-preview/references/roles-governance.md`](../k-teamwork-preview/references/roles-governance.md).
 That skill is the source of truth for scoping → blueprint → Team Sheet + DAG →
 approval → isolated execution → Success Audit per milestone. `e2e` remains the
 delivery pipeline the team executes.
@@ -111,7 +111,7 @@ Follow `teamwork-preview` exactly:
    (tightly coupled, test-driven), or Long Proof / Deep Research (divergent
    exploration + synthesis).
 3. Design a Team Sheet from
-   [`../teamwork-preview/resources/team-sheet-template.md`](../teamwork-preview/resources/team-sheet-template.md):
+   [`../k-teamwork-preview/resources/team-sheet-template.md`](../k-teamwork-preview/resources/team-sheet-template.md):
    roster with scoped paths, milestone DAG with verification gates, and a
    token/cost warning. Save it as `TEAM_PLAN.md`.
 4. Stop for explicit user approval. Do not launch specialists until the user replies
@@ -132,7 +132,7 @@ Read-only tracks may run in parallel when independent. Writable tracks may run i
 parallel only when their Owns paths do not overlap. In a shared workspace, use one
 writer at a time unless the host provides verified isolation (e.g. separate
 worktrees per
-[`../teamwork-preview/references/roles-governance.md`](../teamwork-preview/references/roles-governance.md)).
+[`../k-teamwork-preview/references/roles-governance.md`](../k-teamwork-preview/references/roles-governance.md)).
 
 ## Stage 0 - Intake and context discovery
 
@@ -151,7 +151,7 @@ worktrees per
 
 ## Stage 1 - Review (read-only)
 
-Do not modify files during this stage. Reproduce the `review` skill: isolate the
+Do not modify files during this stage. Reproduce the `k-review` skill: isolate the
 scope (module / feature / latest diff), audit on all 4 dimensions
 (logic & security, performance, architecture, maintainability) with `path:line`
 evidence, triage every finding (🔴 BLOCKER / 🟡 WARNING / 🔵 NITPICK), and draft
@@ -178,7 +178,7 @@ Brief. Do not accept a specialist summary as proof.
 
 ## Stage 2 - Ask (consulting direction, read-only)
 
-Do not modify files during this stage. Reproduce the `ask` skill on the Evidence
+Do not modify files during this stage. Reproduce the `k-ask` skill on the Evidence
 Brief: confirm the diagnosis, derive options A (minimal) vs B (architectural),
 score the trade-off matrix, and commit to a direction (A, B, or "A now, B later")
 with the text-only blueprint (ordered steps, target files, gotchas).
@@ -199,7 +199,7 @@ assumption and continue.
 ## Stage 3 - Goal (execution contract, scoped write only)
 
 The ONLY write allowed in this stage is `docs/goal/GOAL_*.txt`. Reproduce the
-`goal` skill: convert the direction + blueprint into a Goal Prompt and persist it
+`k-goal` skill: convert the direction + blueprint into a Goal Prompt and persist it
 per the goal naming rules (`GOAL_<YYYY-MM-DD>_<n>_<slug>.txt`, never overwrite).
 For codebase-intervention tasks the GOAL file MUST contain the 4-part structure:
 role, Layer-1 decomposition (sub-goals in dependency order), Layer-2 loop
@@ -270,7 +270,7 @@ failing → stop and report the integration conflict.
 
 In a teamwork tier, the Success Audit from `teamwork-preview` is non-negotiable.
 A dedicated Success Auditor signs off every milestone using
-[`../teamwork-preview/resources/audit-checklist-template.md`](../teamwork-preview/resources/audit-checklist-template.md)
+[`../k-teamwork-preview/resources/audit-checklist-template.md`](../k-teamwork-preview/resources/audit-checklist-template.md)
 (`APPROVED` / `CHANGES_REQUESTED`):
 
 - Impartiality: the Auditor never wrote code for the milestone under review and

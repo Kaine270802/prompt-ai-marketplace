@@ -3,12 +3,12 @@
 Bộ 7 Agent Skills dùng chung cho nhiều coding agent, từ nâng
 cấp prompt/goal đến read-only review, implementation, deep reasoning và
 verification end-to-end.
-`teamwork-preview` điều phối team autonomous: Sentinel phỏng vấn scoping, chọn
+`k-teamwork-preview` điều phối team autonomous: Sentinel phỏng vấn scoping, chọn
 blueprint (Distributed / Iterative / Long Proof), lập Team Sheet + milestone DAG,
 chờ user duyệt, rồi chạy specialists cách ly kèm Success Auditor độc lập.
-`boost` biến agent thành reasoning engine 3 tầng cho bug khó (investigate
+`k-boost` biến agent thành reasoning engine 3 tầng cho bug khó (investigate
 read-only → patch tối thiểu → adversarial falsification + backtracking).
-`e2e` tự chọn direct execution hoặc compose `teamwork-preview` khi work phức tạp.
+`k-e2e` tự chọn direct execution hoặc compose `k-teamwork-preview` khi work phức tạp.
 Mỗi skill là một thư mục `SKILL.md` theo
 [Agent Skills open standard](https://agentskills.io/). Cài plugin marketplace nhận
 đủ 7 skill.
@@ -17,20 +17,20 @@ Mỗi skill là một thư mục `SKILL.md` theo
 
 | Skill | Chức năng | Kết quả |
 |---|---|---|
-| `ask` | Tư vấn read-only: audit, chẩn đoán, so phương án A/B, blueprint text | Báo cáo tư vấn đầy đủ; không sửa code |
-| `goal` | Làm rõ outcome, scope và success criteria | Một goal copy-ready + auto-lưu `docs/goal/GOAL_*.txt`; để ngỏ cách thực hiện |
-| `review` | Audit read-only: scope, đa chiều, triage 🔴🟡🔵, roadmap khắc phục | Báo cáo audit có cấu trúc; chỉ dẫn text, không sửa code |
-| `engineer` | Thực thi task (nuốt Goal Prompt/blueprint/roadmap), retry ≤3 + rollback + chốt xác minh | Thay đổi nhỏ nhất kèm tests và verification |
-| `boost` | Deep reasoning cho bug khó: hypotheses → investigate → patch → falsify | Root cause có repro test; patch tối thiểu qua adversarial check |
-| `e2e` | Ghép `review → ask → goal → engineer → verify`, có adaptive teamwork | Hoàn thành coding task bằng direct hoặc coordinator-led subagents |
-| `teamwork-preview` | Sentinel + blueprint, Team Sheet + DAG, duyệt, specialists cách ly, Success Auditor | Team Sheet theo template + sign-off `APPROVED` từng milestone |
+| `k-ask` | Tư vấn read-only: audit, chẩn đoán, so phương án A/B, blueprint text | Báo cáo tư vấn đầy đủ; không sửa code |
+| `k-goal` | Làm rõ outcome, scope và success criteria | Một goal copy-ready + auto-lưu `docs/goal/GOAL_*.txt`; để ngỏ cách thực hiện |
+| `k-review` | Audit read-only: scope, đa chiều, triage 🔴🟡🔵, roadmap khắc phục | Báo cáo audit có cấu trúc; chỉ dẫn text, không sửa code |
+| `k-engineer` | Thực thi task (nuốt Goal Prompt/blueprint/roadmap), retry ≤3 + rollback + chốt xác minh | Thay đổi nhỏ nhất kèm tests và verification |
+| `k-boost` | Deep reasoning cho bug khó: hypotheses → investigate → patch → falsify | Root cause có repro test; patch tối thiểu qua adversarial check |
+| `k-e2e` | Ghép `k-review → k-ask → k-goal → k-engineer → verify`, có adaptive teamwork | Hoàn thành coding task bằng direct hoặc coordinator-led subagents |
+| `k-teamwork-preview` | Sentinel + blueprint, Team Sheet + DAG, duyệt, specialists cách ly, Success Auditor | Team Sheet theo template + sign-off `APPROVED` từng milestone |
 
-`ask`, `goal`, `review`, `engineer`, `e2e`, `teamwork-preview` là **manual-only**:
-chỉ dùng khi user gọi rõ tên skill. `boost` chạy khi user gọi `/boost` (hoặc nêu
+`k-ask`, `k-goal`, `k-review`, `k-engineer`, `k-e2e`, `k-teamwork-preview` là **manual-only**:
+chỉ dùng khi user gọi rõ tên skill. `k-boost` chạy khi user gọi `/k-boost` (hoặc nêu
 rõ cần deep thinking / verification chặt) và task khớp mục When to Activate của
 nó. Cú pháp gọi khác nhau theo host; xem bảng Quick start bên dưới.
 
-## Workflow `e2e`
+## Workflow `k-e2e`
 
 ```text
 raw user prompt
@@ -51,16 +51,16 @@ execution gate
 Layer-3 final gate → Coordinator synthesizes audited outputs
 ```
 
-`e2e` giữ review, consulting brief và GOAL file làm internal artifacts, vì vậy user không phải
+`k-e2e` giữ review, consulting brief và GOAL file làm internal artifacts, vì vậy user không phải
 copy prompt qua các agent. Skill chỉ dừng để hỏi khi có ambiguity làm thay đổi đáng
 kể implementation, L4/L5, schema/auth/permission change hoặc dependency mới.
 
 ### Teamwork mode
 
-`teamwork-preview` là control-plane skill độc lập, bám lifecycle 4 phase của nó:
+`k-teamwork-preview` là control-plane skill độc lập, bám lifecycle 4 phase của nó:
 Sentinel phỏng vấn scoping → chọn blueprint → lập Team Sheet + milestone DAG →
 user duyệt → specialists chạy cách ly (worktrees) → Success Auditor sign-off từng
-milestone. `e2e` compose skill này khi chọn TEAMWORK. Skill **không** giả lập
+milestone. `k-e2e` compose skill này khi chọn TEAMWORK. Skill **không** giả lập
 native command Antigravity và **không** dùng protocol Sentinel/capsule riêng.
 
 Workflow bắt buộc:
@@ -69,8 +69,8 @@ Workflow bắt buộc:
    criteria dạng binary (lệnh build / test / typecheck / lint).
 2. Blueprint — Distributed Coding (shards song song), Iterative Coding
    (test-driven, phụ thuộc chặt), hoặc Long Proof / Deep Research (thám hiểm
-   phân kỳ + tổng hợp). Xem `skills/teamwork-preview/references/blueprints.md`.
-3. Team Sheet — theo `skills/teamwork-preview/resources/team-sheet-template.md`:
+   phân kỳ + tổng hợp). Xem `skills/k-teamwork-preview/references/blueprints.md`.
+3. Team Sheet — theo `skills/k-teamwork-preview/resources/team-sheet-template.md`:
    roster + scoped paths, milestone DAG + verification gate, cảnh báo token/cost.
    Lưu `TEAM_PLAN.md`.
 4. Approval gate — dừng đến khi user trả lời yes / approve / go, hoặc sửa plan.
@@ -81,7 +81,7 @@ Workflow bắt buộc:
    clean checkout theo `resources/audit-checklist-template.md`; chỉ `APPROVED`
    mới sang milestone tiếp theo.
 
-Roles (xem `skills/teamwork-preview/references/roles-governance.md`):
+Roles (xem `skills/k-teamwork-preview/references/roles-governance.md`):
 
 | Role | Trách nhiệm |
 |---|---|
@@ -103,8 +103,8 @@ Guardrails:
 
 | Host | Teamwork behavior |
 |---|---|
-| Cursor | Parallel Task/subagents khi Agent expose; không thì sequential + shared files. Gọi `/teamwork-preview` hoặc `/e2e` |
-| GitHub Copilot | Agent mode / Copilot CLI; parallel khi host spawn được. Gọi `/teamwork-preview` hoặc `/e2e` |
+| Cursor | Parallel Task/subagents khi Agent expose; không thì sequential + shared files. Gọi `/k-teamwork-preview` hoặc `/k-e2e` |
+| GitHub Copilot | Agent mode / Copilot CLI; parallel khi host spawn được. Gọi `/k-teamwork-preview` hoặc `/k-e2e` |
 | Antigravity | Ưu tiên native `/teamwork-preview` khi đã mở; ngoài ra dùng subagent song song nếu host expose |
 | Codex | Spawn/delegation khi có; không thì sequential + shared files |
 | Claude Code | Agent/subagents hoặc agent teams khi enabled |
@@ -117,32 +117,32 @@ Guardrails:
 Ví dụ:
 
 ```text
-/prompt-toolkit:e2e Sửa lỗi login bị kẹt loading khi API trả 401 và thêm regression test.
+/prompt-toolkit:k-e2e Sửa lỗi login bị kẹt loading khi API trả 401 và thêm regression test.
 ```
 
 Ở host dùng `$skill-name`:
 
 ```text
-$e2e Sửa lỗi login bị kẹt loading khi API trả 401 và thêm regression test.
+$k-e2e Sửa lỗi login bị kẹt loading khi API trả 401 và thêm regression test.
 ```
 
 Gọi controller skill trực tiếp trên host hỗ trợ namespace hoặc `$skill`:
 
 ```text
-/prompt-toolkit:teamwork-preview Xây feature này bằng một team có independent audit.
-$teamwork-preview Xây feature này bằng một team có independent audit.
+/prompt-toolkit:k-teamwork-preview Xây feature này bằng một team có independent audit.
+$k-teamwork-preview Xây feature này bằng một team có independent audit.
 ```
 
 Deep reasoning cho bug khó:
 
 ```text
-/prompt-toolkit:boost Race condition khi 2 worker cùng ghi cache, fix 2 lần vẫn flaky.
+/prompt-toolkit:k-boost Race condition khi 2 worker cùng ghi cache, fix 2 lần vẫn flaky.
 $boost Deadlock khi checkout đồng thời, cần root cause có repro test.
 ```
 
 Với Antigravity, nếu native `/teamwork-preview` đã sở hữu session thì reuse nó và
 áp dụng Team Sheet của skill này làm operating plan; không mở team thứ hai. Native
-command có thể tốn quota/credits lớn. Để gọi skill plugin, chọn `teamwork-preview` có source `prompt-toolkit` trong `/skills` hoặc yêu cầu rõ bằng lời; chỉ dùng cú pháp namespace khi host thực sự hiển thị nó.
+command có thể tốn quota/credits lớn. Để gọi skill plugin, chọn `k-teamwork-preview` có source `prompt-toolkit` trong `/skills` hoặc yêu cầu rõ bằng lời; chỉ dùng cú pháp namespace khi host thực sự hiển thị nó.
 
 ## Cấu trúc repository
 
@@ -178,17 +178,17 @@ prompt-ai-marketplace/
 
 | Host | Cách cài khuyến nghị | Cách gọi teamwork |
 |---|---|---|
-| Cursor | Plugin local hoặc copy skills | `/teamwork-preview <task>` hoặc `/e2e` |
-| GitHub Copilot | Copy skills hoặc `gh skill` | `/teamwork-preview <task>` hoặc `/e2e` |
-| Claude Code | Marketplace plugin | `/prompt-toolkit:teamwork-preview <task>` hoặc `/prompt-toolkit:e2e` |
-| Codex | Native marketplace plugin | `$teamwork-preview <task>` hoặc `$e2e` |
+| Cursor | Plugin local hoặc copy skills | `/teamwork-preview <task>` hoặc `/k-e2e` |
+| GitHub Copilot | Copy skills hoặc `gh skill` | `/teamwork-preview <task>` hoặc `/k-e2e` |
+| Claude Code | Marketplace plugin | `/prompt-toolkit:k-teamwork-preview <task>` hoặc `/prompt-toolkit:k-e2e` |
+| Codex | Native marketplace plugin | `$k-teamwork-preview <task>` hoặc `$k-e2e` |
 | Google Antigravity | Native `agy plugin` | Native `/teamwork-preview`; custom chọn từ `/skills` theo source plugin |
-| Grok Build | Marketplace plugin | `/teamwork-preview <task>` hoặc `/e2e` |
-| Gemini CLI | Copy hoặc `gemini skills` | `/teamwork-preview <task>` hoặc `/e2e` |
-| Windsurf | Copy vào `.windsurf/skills/` | Yêu cầu “use the teamwork-preview skill” hoặc `/teamwork-preview` |
+| Grok Build | Marketplace plugin | `/teamwork-preview <task>` hoặc `/k-e2e` |
+| Gemini CLI | Copy hoặc `gemini skills` | `/teamwork-preview <task>` hoặc `/k-e2e` |
+| Windsurf | Copy vào `.windsurf/skills/` | Yêu cầu “use the k-teamwork-preview skill” hoặc `/k-teamwork-preview` |
 | OpenCode | Copy vào `.opencode/skills/` | Yêu cầu “use the teamwork-preview skill” |
-| Hermes Agent | Copy vào `~/.hermes/skills/` | `/teamwork-preview <task>` hoặc `/e2e` |
-| ZCode | Marketplace plugin | `/prompt-toolkit:teamwork-preview <task>` hoặc `$teamwork-preview` |
+| Hermes Agent | Copy vào `~/.hermes/skills/` | `/teamwork-preview <task>` hoặc `/k-e2e` |
+| ZCode | Marketplace plugin | `/prompt-toolkit:k-teamwork-preview <task>` hoặc `$k-teamwork-preview` |
 
 Các lệnh bên dưới giả định terminal đang đứng tại root `prompt-ai-marketplace/`.
 Nếu đang ở nơi khác, thay `./prompt-toolkit/skills` bằng absolute path tương ứng.
@@ -236,14 +236,14 @@ codex plugin list
 ```
 
 Mở task/session mới sau khi cài vì catalog của task đang chạy không hot-reload, rồi
-gọi `$teamwork-preview <task>` hoặc `$e2e <task>`. Với Codex cũ chưa có
+gọi `$k-teamwork-preview <task>` hoặc `$k-e2e <task>`. Với Codex cũ chưa có
 `codex plugin`, có thể fallback bằng cách
 copy `./prompt-toolkit/skills/*` vào `~/.codex/skills/`.
-`agents/openai.yaml` trong `e2e` và `teamwork-preview` cung cấp display metadata cho
+`agents/openai.yaml` trong `k-e2e` và `k-teamwork-preview` cung cấp display metadata cho
 các Codex surface hỗ trợ field này. Xem
 [OpenAI Skills catalog](https://github.com/openai/skills).
 
-Khi surface Codex expose subagent delegation, `e2e`/`teamwork-preview` ưu tiên
+Khi surface Codex expose subagent delegation, `k-e2e`/`k-teamwork-preview` ưu tiên
 parallel specialists theo Team Sheet. Nếu không có, chạy sequential focused sessions
 với shared files; không bịa ý kiến từ agent chưa chạy.
 
@@ -272,7 +272,7 @@ New-Item -ItemType Junction -Force -Path "$env:USERPROFILE\.cursor\plugins\local
 ```
 
 Restart Cursor hoặc **Developer: Reload Window**. Mở **Customize → Skills** và gọi
-`/ask`, `/goal`, `/review`, `/engineer`, `/e2e`, `/teamwork-preview` trong Agent chat.
+`/k-ask`, `/k-goal`, `/k-review`, `/k-engineer`, `/k-e2e`, `/k-teamwork-preview` trong Agent chat.
 
 Nếu đã Add Marketplace trỏ vào folder này rồi bị `Failed to resolve git ref "HEAD"`:
 Uninstall plugin đó, rồi dùng `~/.cursor/plugins/local` ở trên. Muốn giữ marketplace
@@ -319,7 +319,7 @@ Cursor cũng đọc `.agents/skills/`, `.claude/skills/` và `.codex/skills/`. X
 [Cursor Agent Skills](https://cursor.com/docs/skills) và
 [Cursor Plugins](https://cursor.com/docs/plugins).
 
-Cursor có built-in `/review`. Skill `review` của plugin là Elite Code Auditor
+Cursor có lệnh review built-in. Skill `k-review` của plugin là Elite Code Auditor
 read-only; gọi rõ “use the prompt-toolkit review skill” nếu slash command bị nhầm
 built-in. Mọi skill dùng `disable-model-invocation: true` — chỉ chạy khi user gọi
 `/skill-name`, không auto-trigger.
@@ -328,7 +328,7 @@ built-in. Mọi skill dùng `disable-model-invocation: true` — chỉ chạy kh
 
 Copilot (VS Code agent mode, Copilot CLI, Copilot app, cloud agent) đọc Agent Skills
 từ `.github/skills/`, `.agents/skills/`, `.claude/skills/` (project) và
-`~/.copilot/skills/`, `~/.agents/skills/` (user). Gọi `/e2e` hoặc `/teamwork-preview`
+`~/.copilot/skills/`, `~/.agents/skills/` (user). Gọi `/k-e2e` hoặc `/k-teamwork-preview`
 trong chat.
 
 Workspace:
@@ -387,16 +387,16 @@ mkdir -p ~/.gemini/config/skills
 cp -R ./prompt-toolkit/skills/* ~/.gemini/config/skills/
 ```
 
-Mở hoặc reload workspace, rồi nhắc rõ “Use the `teamwork-preview` skill to ...” hoặc
-“Use the `e2e` skill to ...”. Antigravity tự
+Mở hoặc reload workspace, rồi nhắc rõ “Use the `k-teamwork-preview` skill to ...” hoặc
+“Use the `k-e2e` skill to ...”. Antigravity tự
 discover skill theo `name` và `description`. Bản hiện hành ưu tiên `.agents/skills/`
 cho workspace và vẫn tương thích `.agent/skills/` cũ. Xem
 [Antigravity Agent Skills](https://antigravity.google/docs/skills).
 
 Trên Antigravity, `/teamwork-preview` không namespace vẫn được dành cho native
-command. Với skill plugin, mở `/skills`, chọn `teamwork-preview` từ source
+command. Với skill plugin, mở `/skills`, chọn `k-teamwork-preview` từ source
 `prompt-toolkit`, hoặc yêu cầu agent dùng “prompt-toolkit teamwork-preview skill”.
-Chỉ dùng `/prompt-toolkit:teamwork-preview` nếu chính UI hiện cú pháp đó. Nếu native
+Chỉ dùng `/prompt-toolkit:k-teamwork-preview` nếu chính UI hiện cú pháp đó. Nếu native
 controller đã chạy, reuse và áp dụng Team Sheet; không mở team thứ hai.
 
 ### OpenCode
@@ -416,8 +416,8 @@ cp -R ./prompt-toolkit/skills/* ~/.config/opencode/skills/
 ```
 
 OpenCode cũng discover `.agents/skills/` và `.claude/skills/`. Nếu skill không xuất
-hiện, kiểm tra `permission.skill` trong `opencode.json` không đặt `e2e` hoặc
-`teamwork-preview` thành `deny`, sau đó yêu cầu agent dùng đúng skill. Xem
+hiện, kiểm tra `permission.skill` trong `opencode.json` không đặt `k-e2e` hoặc
+`k-teamwork-preview` thành `deny`, sau đó yêu cầu agent dùng đúng skill. Xem
 [OpenCode Agent Skills](https://opencode.ai/docs/skills).
 
 ### Grok Build
@@ -457,7 +457,7 @@ cp -R ./prompt-toolkit/skills/* ~/.gemini/skills/
 Hoặc link local plugin:
 
 ```bash
-gemini skills link "$(pwd)/prompt-toolkit/skills/e2e" --scope user
+gemini skills link "$(pwd)/prompt-toolkit/skills/k-e2e" --scope user
 gemini skills list
 ```
 
@@ -480,7 +480,7 @@ mkdir -p ~/.codeium/windsurf/skills
 cp -R ./prompt-toolkit/skills/* ~/.codeium/windsurf/skills/
 ```
 
-Reload window, rồi gọi `/teamwork-preview` hoặc yêu cầu dùng đúng skill.
+Reload window, rồi gọi `/k-teamwork-preview` hoặc yêu cầu dùng đúng skill.
 
 ### Hermes Agent
 
@@ -495,10 +495,10 @@ hermes skills list
 Khi repository đã public trên GitHub, có thể cài riêng skill mà không copy:
 
 ```bash
-hermes skills inspect OWNER/REPO/prompt-toolkit/skills/e2e
-hermes skills install OWNER/REPO/prompt-toolkit/skills/e2e
-hermes skills inspect OWNER/REPO/prompt-toolkit/skills/teamwork-preview
-hermes skills install OWNER/REPO/prompt-toolkit/skills/teamwork-preview
+hermes skills inspect OWNER/REPO/prompt-toolkit/skills/k-e2e
+hermes skills install OWNER/REPO/prompt-toolkit/skills/k-e2e
+hermes skills inspect OWNER/REPO/prompt-toolkit/skills/k-teamwork-preview
+hermes skills install OWNER/REPO/prompt-toolkit/skills/k-teamwork-preview
 ```
 
 Hermes chạy security scan với skill từ community source. Sau khi cài, dùng
@@ -513,14 +513,14 @@ Cài toàn bộ plugin:
 2. Vào **Settings → Plugins → Marketplace**.
 3. Nhấn `+`, nhập local path tới root `prompt-ai-marketplace/` hoặc GitHub URL.
 4. Chọn **prompt-toolkit**, nhấn **Get**, bảo đảm plugin đang enabled.
-5. Gõ `/` và chọn `prompt-toolkit:teamwork-preview` hoặc `prompt-toolkit:e2e`.
+5. Gõ `/` và chọn `prompt-toolkit:k-teamwork-preview` hoặc `prompt-toolkit:k-e2e`.
 
 Cài riêng skill ở user-level:
 
 ```bash
 mkdir -p ~/.zcode/skills
-cp -R ./prompt-toolkit/skills/e2e ~/.zcode/skills/
-cp -R ./prompt-toolkit/skills/teamwork-preview ~/.zcode/skills/
+cp -R ./prompt-toolkit/skills/k-e2e ~/.zcode/skills/
+cp -R ./prompt-toolkit/skills/k-teamwork-preview ~/.zcode/skills/
 ```
 
 Sau đó vào **Settings → Skills → Refresh**. ZCode cũng có thể import skill từ
@@ -599,10 +599,10 @@ Khi phát hành thay đổi:
 
 - Đọc `SKILL.md` trước khi cài từ repository không tin cậy; skill là operational
   instructions và chạy với quyền của agent host.
-- `e2e` không tự thêm dependency, đổi auth/permission, migration/schema hoặc public
+- `k-e2e` không tự thêm dependency, đổi auth/permission, migration/schema hoặc public
   contract nếu chưa có explicit approval.
-- `review` luôn read-only. `e2e` chỉ giữ Stage Review read-only rồi chuyển rõ ràng
-  sang Stage Engineer; không làm suy yếu read-only contract của skill `review`.
+- `k-review` luôn read-only. `k-e2e` chỉ giữ Stage Review read-only rồi chuyển rõ ràng
+  sang Stage Engineer; không làm suy yếu read-only contract của skill `k-review`.
 - Teamwork: Coordinator không làm thay toàn bộ team. Domain Builder chỉ sửa path
   mình Owns. Verifier chạy checks; Critic/Auditor không repair. Bắt buộc cổng duyệt
   Team Sheet và independent verification trước khi bàn giao.
@@ -613,8 +613,8 @@ Khi phát hành thay đổi:
 ## Nguồn nội dung
 
 Các skill prompt/engineering được phát triển từ `ASK.md`, `ASK_GOAL.md`, `REVIEW.md`
-và `AGENTS.md` trong workspace `PROMPT AI`; `e2e` kết hợp behavioral core của
-`review`, `ask` và `engineer`. `teamwork-preview` được port từ folder
+và `AGENTS.md` trong workspace `PROMPT AI`; `k-e2e` kết hợp behavioral core của
+`k-review`, `k-ask` và `k-engineer`. `k-teamwork-preview` được port từ folder
 `teamwork-preview/` trong workspace `PROMPT AI`: Coordinator / Hiring Manager, Team
 Sheet, cổng duyệt bắt buộc, launch native-or-sequential, independent Verifier rồi
 Critic/Auditor.
