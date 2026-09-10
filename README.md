@@ -1,6 +1,6 @@
 # prompt-ai-marketplace
 
-Marketplace chứa plugin **`prompt-toolkit`** (v2.8.0): bộ 7 Agent Skills dùng chung cho
+Marketplace chứa plugin **`prompt-toolkit`** (v2.8.1): bộ 7 Agent Skills dùng chung cho
 nhiều coding agent — từ nâng cấp prompt/goal, review read-only, implementation,
 deep reasoning, đến delivery end-to-end và autonomous agent teamwork. Tối ưu output layout
 dễ đọc cho tiếng Việt.
@@ -9,7 +9,7 @@ dễ đọc cho tiếng Việt.
 
 | Plugin | Version | Skills | Mô tả |
 |---|---|---|---|
-| `prompt-toolkit` | 2.8.0 | `ask`, `goal`, `review`, `engineer`, `boost`, `e2e`, `teamwork-preview` | Prompt/goal refinement, read-only audit, engineering có test, deep reasoning, end-to-end delivery, teamwork có duyệt + audit độc lập |
+| `prompt-toolkit` | 2.8.1 | `ask`, `goal`, `review`, `engineer`, `boost`, `e2e`, `teamwork-preview` | Prompt/goal refinement, read-only audit, engineering có test, deep reasoning, end-to-end delivery, teamwork có duyệt + audit độc lập |
 
 | Skill | Làm gì | Kết quả |
 |---|---|---|
