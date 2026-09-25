@@ -1,15 +1,16 @@
 # prompt-ai-marketplace
 
-Marketplace chứa plugin **`prompt-toolkit`** (v2.9.0): bộ 7 Agent Skills dùng chung cho
+Marketplace chứa plugin **`prompt-toolkit`** (v2.10.0): bộ 9 Agent Skills dùng chung cho
 nhiều coding agent — từ nâng cấp prompt/goal, review read-only, implementation,
-deep reasoning, đến delivery end-to-end và autonomous agent teamwork. Tối ưu output layout
+deep reasoning, vòng kiểm định theo SPEC (k-nspec/k-rvspec),
+đến delivery end-to-end và autonomous agent teamwork. Tối ưu output layout
 dễ đọc cho tiếng Việt.
 
 ## Plugin bên trong
 
 | Plugin | Version | Skills | Mô tả |
 |---|---|---|---|
-| `prompt-toolkit` | 2.9.0 | `k-ask`, `k-goal`, `k-review`, `k-engineer`, `k-boost`, `k-e2e`, `k-teamwork-preview` | Prompt/goal refinement, read-only audit, engineering có test, deep reasoning, end-to-end delivery, teamwork có duyệt + audit độc lập |
+| `prompt-toolkit` | 2.10.0 | `k-ask`, `k-goal`, `k-review`, `k-engineer`, `k-boost`, `k-nspec`, `k-rvspec`, `k-e2e`, `k-teamwork-preview` | Prompt/goal refinement, read-only audit, engineering có test, deep reasoning, vòng kiểm định theo SPEC, end-to-end delivery, teamwork có duyệt + audit độc lập |
 
 | Skill | Làm gì | Kết quả |
 |---|---|---|
@@ -18,10 +19,12 @@ dễ đọc cho tiếng Việt.
 | `k-review` | Audit read-only: scope, đa chiều, triage 🔴🟡🔵, roadmap khắc phục | Báo cáo audit có cấu trúc; chỉ dẫn text, không sửa code |
 | `k-engineer` | Thực thi task (nuốt Goal Prompt/blueprint/roadmap), retry ≤3 + rollback + chốt xác minh | Thay đổi nhỏ nhất kèm tests + verification |
 | `k-boost` | Deep reasoning cho bug khó: hypotheses → investigate → patch → falsify | Root cause có repro test; patch tối thiểu qua adversarial check |
+| `k-nspec` | Lập SPEC mới từ mục tiêu + codebase: điều kiện đạt đo được, ID theo đường găng, Hồ sơ repo, tự chốt giả định, commit SPEC + ghi `turn_<n>.txt` | SPEC mốc theo mẫu + khối tin nhắn lượt đầu |
+| `k-rvspec` | Người kiểm định theo SPEC: tái lập bằng chứng, chấm bước/ID, tự quyết, commit sổ, ghi khối lượt kế tiếp | Xếp loại lượt + `turn_<n+1>.txt` cho agent |
 | `k-e2e` | Ghép `k-review → k-ask → k-goal → k-engineer → verify` (GOAL file làm hợp đồng) | Task hoàn thành, direct hoặc teamwork |
 | `k-teamwork-preview` | Sentinel + blueprint, Team Sheet + DAG, duyệt, specialists cách ly, Success Auditor | Team Sheet theo template + sign-off `APPROVED` từng milestone |
 
-`k-ask`, `k-goal`, `k-review`, `k-engineer`, `k-e2e`, `k-teamwork-preview` là **manual-only**
+`k-ask`, `k-goal`, `k-review`, `k-engineer`, `k-nspec`, `k-rvspec`, `k-e2e`, `k-teamwork-preview` là **manual-only**
 (`disable-model-invocation: true`): chỉ chạy khi bạn gọi rõ tên skill.
 `k-boost` chạy khi bạn gọi `/k-boost` hoặc nêu rõ cần deep thinking / verification chặt.
 
@@ -60,12 +63,14 @@ cp -R ./prompt-toolkit/skills/* <skills-dir-cua-host>/
 /k-goal Tăng tỉ lệ hoàn thành onboarding trong 60 ngày
 /k-review Vì sao hàm handleLogin() kẹt loading ở nhánh lỗi?
 /k-engineer Sửa lỗi login 401 + thêm regression test
+/k-nspec Mục tiêu release M1: login 401 hết kẹt loading
+/k-rvspec @docs/spec/SPEC_M1.md @docs/turnlog/turn_1_report.md
 /k-e2e Sửa lỗi login bị kẹt loading khi API trả 401 và thêm regression test
 /k-teamwork-preview Xây feature này bằng một team có independent audit
 ```
 
-- Host dùng namespace: `/prompt-toolkit:k-e2e`, `/prompt-toolkit:k-teamwork-preview`.
-- Host dùng `$skill`: `$k-e2e`, `$k-teamwork-preview`.
+- Host dùng namespace: `/prompt-toolkit:k-e2e`, `/prompt-toolkit:k-teamwork-preview`, `/prompt-toolkit:k-nspec`, `/prompt-toolkit:k-rvspec`.
+- Host dùng `$skill`: `$k-e2e`, `$k-teamwork-preview`, `$k-nspec`, `$k-rvspec`.
 - Trên Antigravity, native `/teamwork-preview` được ưu tiên nếu đã sở hữu session;
   skill plugin thì chọn trong `/skills` theo source `prompt-toolkit`.
 
@@ -94,14 +99,17 @@ prompt-ai-marketplace/
     ├── plugin.json
     ├── README.md                  # hướng dẫn chi tiết từng host
     └── skills/
-        ├── ask/SKILL.md
-        ├── goal/SKILL.md
-        ├── review/SKILL.md
-        ├── engineer/SKILL.md
-        ├── e2e/SKILL.md
-        └── teamwork-preview/
+        ├── k-ask/SKILL.md
+        ├── k-goal/SKILL.md
+        ├── k-review/SKILL.md
+        ├── k-engineer/SKILL.md
+        ├── k-boost/SKILL.md
+        ├── k-nspec/SKILL.md + templates/
+        ├── k-rvspec/SKILL.md
+        ├── k-e2e/SKILL.md
+        └── k-teamwork-preview/
             ├── SKILL.md
-            └── references/example-teams.md
+            └── references/ + resources/
 ```
 
 ## Phát triển

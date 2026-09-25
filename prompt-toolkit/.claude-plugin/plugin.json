@@ -1,7 +1,7 @@
 {
   "name": "prompt-toolkit",
-  "version": "2.9.0",
-  "description": "Seven manual skills for prompt and goal refinement, read-only review, engineering, end-to-end delivery, and coordinator-led agent teamwork.",
+  "version": "2.10.0",
+  "description": "Nine manual skills for prompt and goal refinement, read-only review, engineering, SPEC-driven review loop, end-to-end delivery, and coordinator-led agent teamwork.",
   "author": {
     "name": "kai"
   }

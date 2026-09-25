@@ -1,7 +1,7 @@
 {
   "name": "prompt-toolkit",
-  "version": "2.9.0",
-  "description": "Seven manual skills for prompt and goal refinement, read-only review, engineering, end-to-end delivery, and coordinator-led agent teamwork.",
+  "version": "2.10.0",
+  "description": "Nine manual skills for prompt and goal refinement, read-only review, engineering, SPEC-driven review loop, end-to-end delivery, and coordinator-led agent teamwork.",
   "author": {
     "name": "kai"
   },
@@ -9,6 +9,7 @@
     "prompt",
     "review",
     "engineering",
+    "spec",
     "end-to-end",
     "goal",
     "multi-agent",
@@ -18,7 +19,7 @@
   "interface": {
     "displayName": "Prompt Toolkit",
     "shortDescription": "Review, refine, implement, and verify coding tasks",
-    "longDescription": "Seven manual skills including a coordinator-led teamwork workflow: Team Sheet, user approval, specialized parallel subagents, independent verifier/critic, and sequential fallback when native subagents are unavailable.",
+    "longDescription": "Nine manual skills including SPEC-driven review loop and coordinator-led teamwork workflow: SPEC authoring, turn-by-turn review ledger, Team Sheet, user approval, specialized parallel subagents, independent verifier/critic, and sequential fallback when native subagents are unavailable.",
     "developerName": "kai",
     "category": "Engineering",
     "capabilities": [
