@@ -5,10 +5,30 @@ from pathlib import Path
 
 PLUGIN_ROOT = Path(__file__).resolve().parents[1]
 MARKETPLACE_ROOT = PLUGIN_ROOT.parent
-TEAMWORK_ROOT = PLUGIN_ROOT / "skills" / "teamwork-preview"
+TEAMWORK_ROOT = PLUGIN_ROOT / "skills" / "k-teamwork-preview"
 TEAMWORK_SKILL = TEAMWORK_ROOT / "SKILL.md"
-TEAMWORK_EXAMPLES = TEAMWORK_ROOT / "references" / "example-teams.md"
-E2E_SKILL = PLUGIN_ROOT / "skills" / "e2e" / "SKILL.md"
+TEAMWORK_BLUEPRINTS = TEAMWORK_ROOT / "references" / "blueprints.md"
+TEAMWORK_ROLES = TEAMWORK_ROOT / "references" / "roles-governance.md"
+TEAMWORK_SHEET = TEAMWORK_ROOT / "resources" / "team-sheet-template.md"
+TEAMWORK_AUDIT = TEAMWORK_ROOT / "resources" / "audit-checklist-template.md"
+E2E_ROOT = PLUGIN_ROOT / "skills" / "k-e2e"
+E2E_SKILL = E2E_ROOT / "SKILL.md"
+E2E_UI_METADATA = E2E_ROOT / "agents" / "openai.yaml"
+
+EXPECTED_SKILLS = {
+    "k-ask",
+    "k-goal",
+    "k-review",
+    "k-engineer",
+    "k-boost",
+    "k-nspec",
+    "k-rvspec",
+    "k-e2e",
+    "k-teamwork-preview",
+}
+
+# Skills that enforce session-wide manual-only invocation markers.
+STRICT_MANUAL_SKILLS = EXPECTED_SKILLS - {"k-boost", "k-teamwork-preview"}
 
 
 def read(path: Path) -> str:
@@ -22,64 +42,92 @@ def load_json(path: Path) -> dict:
 class TeamworkPreviewContractTest(unittest.TestCase):
     def setUp(self) -> None:
         self.skill = read(TEAMWORK_SKILL)
-        self.examples = read(TEAMWORK_EXAMPLES)
+        self.blueprints = read(TEAMWORK_BLUEPRINTS)
+        self.roles = read(TEAMWORK_ROLES)
+        self.sheet = read(TEAMWORK_SHEET)
+        self.audit = read(TEAMWORK_AUDIT)
         self.e2e = read(E2E_SKILL)
         self.readme = read(PLUGIN_ROOT / "README.md")
 
-    def test_skill_matches_source_team_sheet_workflow(self) -> None:
-        self.assertRegex(self.skill, r"(?m)^name: teamwork-preview$")
-        self.assertIn("MANUAL-ONLY", self.skill)
-        self.assertIn("Coordinator / Hiring Manager", self.skill)
-        self.assertIn("Design the Team Sheet", self.skill)
-        self.assertIn("| Role | Specialty | Owns | Inputs | Outputs | Success Criteria |", self.skill)
-        self.assertIn("TEAM_PLAN.md", self.skill)
-        self.assertIn("Present for Approval (Mandatory Gate)", self.skill)
-        self.assertIn("Independent Verifier must run before final delivery", self.skill)
-        self.assertIn("references/example-teams.md", self.skill)
+    def test_skill_matches_current_teamwork_model(self) -> None:
+        self.assertRegex(self.skill, r"(?m)^name: k-teamwork-preview$")
+        self.assertIn("Sentinel", self.skill)
+        self.assertIn("Team Sheet", self.skill)
+        self.assertIn("Success Auditor", self.skill)
+        self.assertIn("Distributed Coding", self.skill)
+        self.assertIn("Iterative Coding", self.skill)
+        self.assertIn("Long Proof", self.skill)
+        self.assertIn("Approval", self.skill)
+        self.assertIn("references/blueprints.md", self.skill)
+        self.assertIn("references/roles-governance.md", self.skill)
+        self.assertIn("resources/team-sheet-template.md", self.skill)
+        self.assertIn("resources/audit-checklist-template.md", self.skill)
+        self.assertIn("/k-teamwork-preview", self.skill)
+        # Old pre-2.6.0 controller model must stay gone.
         self.assertNotIn("TEAMWORK_PROTOCOL_V1", self.skill)
         self.assertNotIn("`CONTROLLER`", self.skill)
         self.assertNotIn("`NATIVE_ADAPTER`", self.skill)
+        self.assertNotIn("example-teams", self.skill)
+        self.assertNotIn("Coordinator / Hiring Manager", self.skill)
+        self.assertNotIn("Independent Verifier", self.skill)
 
-    def test_example_teams_reference_exists_and_protocol_is_gone(self) -> None:
-        self.assertTrue(TEAMWORK_EXAMPLES.is_file())
-        self.assertIn("| Role | Specialty | Owns | Inputs | Outputs | Success Criteria |", self.examples)
-        self.assertIn("Full-Stack Web Application", self.examples)
+    def test_blueprints_roles_and_templates_exist(self) -> None:
+        for path in (
+            TEAMWORK_BLUEPRINTS,
+            TEAMWORK_ROLES,
+            TEAMWORK_SHEET,
+            TEAMWORK_AUDIT,
+        ):
+            self.assertTrue(path.is_file(), path)
+        self.assertIn("Distributed Coding", self.blueprints)
+        self.assertIn("Iterative Coding", self.blueprints)
+        self.assertIn("Long Proof", self.blueprints)
+        self.assertIn("Success Auditor", self.blueprints)
+        self.assertIn("Sentinel", self.roles)
+        self.assertIn("Success Auditor", self.roles)
+        self.assertIn("worktree", self.roles)
+        self.assertIn("Team Sheet", self.sheet)
+        self.assertIn("Milestone", self.sheet)
+        self.assertIn("Approval", self.sheet)
+        self.assertIn("APPROVED", self.audit)
+        self.assertIn("CHANGES_REQUESTED", self.audit)
         self.assertFalse((TEAMWORK_ROOT / "references" / "protocol.md").exists())
+        self.assertFalse(
+            (TEAMWORK_ROOT / "references" / "example-teams.md").exists()
+        )
 
     def test_e2e_composes_the_team_sheet_workflow(self) -> None:
-        self.assertIn("../teamwork-preview/SKILL.md", self.e2e)
-        self.assertIn("../teamwork-preview/references/example-teams.md", self.e2e)
+        self.assertIn("../k-teamwork-preview/SKILL.md", self.e2e)
+        self.assertIn(
+            "../k-teamwork-preview/references/blueprints.md", self.e2e
+        )
+        self.assertIn(
+            "../k-teamwork-preview/references/roles-governance.md", self.e2e
+        )
         self.assertIn("TEAM_PLAN.md", self.e2e)
         self.assertIn("yes / approve / go", self.e2e)
         self.assertNotIn("TEAMWORK_PROTOCOL_V1", self.e2e)
         self.assertNotIn("protocol.md", self.e2e)
         self.assertFalse(
-            (PLUGIN_ROOT / "skills" / "e2e" / "references" / "teamwork-preview.md").exists()
+            (E2E_ROOT / "references" / "teamwork-preview.md").exists()
         )
 
     def test_native_command_and_plugin_skill_are_unambiguous(self) -> None:
-        self.assertIn("native `/teamwork-preview`", self.skill)
-        self.assertIn("never start a second team", self.skill)
-        self.assertIn("chọn `teamwork-preview` có source", self.readme)
+        self.assertIn("Sentinel", self.skill)
+        self.assertIn("Success Auditor", self.skill)
+        self.assertIn("Team Sheet", self.skill)
+        self.assertIn("chọn `k-teamwork-preview` có source", self.readme)
         self.assertIn("`prompt-toolkit` trong `/skills`", self.readme)
         self.assertIn("quota/credits", self.readme)
 
     def test_all_skill_directories_and_ui_metadata_exist(self) -> None:
-        expected = {
-            "ask",
-            "goal",
-            "review",
-            "engineer",
-            "e2e",
-            "teamwork-preview",
-        }
         discovered = {
             path.parent.name
             for path in (PLUGIN_ROOT / "skills").glob("*/SKILL.md")
         }
-        self.assertEqual(expected, discovered)
-        ui_metadata = read(TEAMWORK_ROOT / "agents" / "openai.yaml")
-        self.assertIn("$teamwork-preview", ui_metadata)
+        self.assertEqual(EXPECTED_SKILLS, discovered)
+        ui_metadata = read(E2E_UI_METADATA)
+        self.assertIn("$k-e2e", ui_metadata)
         self.assertIn("Team Sheet", ui_metadata)
 
     def test_manifest_base_versions_match(self) -> None:
@@ -104,12 +152,14 @@ class TeamworkPreviewContractTest(unittest.TestCase):
         codex_version = load_json(
             PLUGIN_ROOT / ".codex-plugin" / "plugin.json"
         )["version"]
+        # Local Codex builds may append "+codex.<cachebuster>"; the base
+        # version must always match.
         self.assertEqual(base_version, codex_version.split("+", 1)[0])
-        self.assertIn("+codex.", codex_version)
 
-    def test_readme_and_manifests_advertise_six_skills(self) -> None:
-        self.assertIn("Bộ 6 Agent Skills", self.readme)
-        self.assertIn("`teamwork-preview`", self.readme)
+    def test_readme_and_manifests_advertise_nine_skills(self) -> None:
+        self.assertIn("Bộ 9 Agent Skills", self.readme)
+        for skill in EXPECTED_SKILLS:
+            self.assertIn(f"`{skill}`", self.readme)
         english_manifests = [
             PLUGIN_ROOT / "plugin.json",
             PLUGIN_ROOT / ".codex-plugin" / "plugin.json",
@@ -120,9 +170,9 @@ class TeamworkPreviewContractTest(unittest.TestCase):
             MARKETPLACE_ROOT / ".cursor-plugin" / "marketplace.json",
         ]
         for manifest in english_manifests:
-            self.assertIn("Six manual skills", read(manifest), manifest)
+            self.assertIn("Nine manual skills", read(manifest), manifest)
         self.assertIn(
-            "Bộ 6 skill", read(PLUGIN_ROOT / ".zcode-plugin" / "plugin.json")
+            "Bộ 9 skill", read(PLUGIN_ROOT / ".zcode-plugin" / "plugin.json")
         )
 
     def test_cursor_and_copilot_install_paths_are_documented(self) -> None:
@@ -152,8 +202,16 @@ class TeamworkPreviewContractTest(unittest.TestCase):
             if not skill_file.is_file():
                 continue
             text = read(skill_file)
-            self.assertIn("disable-model-invocation: true", text, skill_file)
-            self.assertIn("MANUAL-ONLY", text, skill_file)
+            self.assertRegex(text, r"(?m)^name: " + skill_dir.name + r"$")
+            # Every skill documents its explicit invocation path.
+            self.assertIn(f"/{skill_dir.name}", text, skill_file)
+        # The strictly manual skills additionally lock the session gate.
+        # k-boost (on-demand deep reasoning) and k-teamwork-preview
+        # (complexity-triggered) intentionally allow model invocation.
+        for skill_name in STRICT_MANUAL_SKILLS:
+            text = read(PLUGIN_ROOT / "skills" / skill_name / "SKILL.md")
+            self.assertIn("disable-model-invocation: true", text, skill_name)
+            self.assertIn("MANUAL-ONLY", text, skill_name)
 
     def test_moa_is_not_bundled(self) -> None:
         forbidden = (
