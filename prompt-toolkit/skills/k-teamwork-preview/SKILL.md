@@ -1,6 +1,7 @@
 ---
 name: k-teamwork-preview
-description: Orchestrates an autonomous team of specialized AI agents based on task blueprints (Distributed Coding, Iterative Coding, Deep Research/Long Proof) for long-horizon, multi-step, repository-wide projects with independent Success Auditor verification. Use when a project spans multiple subsystems, requires hours of autonomous execution, or benefits from parallel specialist subagents working towards defined milestones.
+description: Orchestrates an autonomous team of specialized AI agents based on task blueprints (Distributed Coding, Iterative Coding, Deep Research/Long Proof) for long-horizon, multi-step, repository-wide projects with independent Success Auditor verification. Use when a project spans multiple subsystems, requires hours of autonomous execution, or benefits from parallel specialist subagents working towards defined milestones. MANUAL-ONLY: use only when the user explicitly invokes /k-teamwork-preview (or /prompt-toolkit:k-teamwork-preview, $k-teamwork-preview).
+disable-model-invocation: true
 ---
 
 # Teamwork: Autonomous Multi-Agent Teams
@@ -10,6 +11,10 @@ The **Teamwork** skill coordinates an autonomous team of specialized subagents t
 ---
 
 ## When to Activate This Skill
+
+> MANUAL-ONLY: run only on explicit user request (`/k-teamwork-preview`,
+> `/prompt-toolkit:k-teamwork-preview`, `$k-teamwork-preview`, or "use the
+> k-teamwork-preview skill"). Never auto-trigger.
 
 Activate this skill when:
 - Executing **repository-wide migrations** (e.g. migrating from Vue 2 to Vue 3, CommonJS to ESM, React class components to hooks).

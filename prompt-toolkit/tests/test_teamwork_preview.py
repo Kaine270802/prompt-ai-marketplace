@@ -28,7 +28,8 @@ EXPECTED_SKILLS = {
 }
 
 # Skills that enforce session-wide manual-only invocation markers.
-STRICT_MANUAL_SKILLS = EXPECTED_SKILLS - {"k-boost", "k-teamwork-preview"}
+# Only k-boost (on-demand deep reasoning) intentionally allows model invocation.
+STRICT_MANUAL_SKILLS = EXPECTED_SKILLS - {"k-boost"}
 
 
 def read(path: Path) -> str:
@@ -206,8 +207,8 @@ class TeamworkPreviewContractTest(unittest.TestCase):
             # Every skill documents its explicit invocation path.
             self.assertIn(f"/{skill_dir.name}", text, skill_file)
         # The strictly manual skills additionally lock the session gate.
-        # k-boost (on-demand deep reasoning) and k-teamwork-preview
-        # (complexity-triggered) intentionally allow model invocation.
+        # Only k-boost (on-demand deep reasoning) intentionally allows
+        # model invocation.
         for skill_name in STRICT_MANUAL_SKILLS:
             text = read(PLUGIN_ROOT / "skills" / skill_name / "SKILL.md")
             self.assertIn("disable-model-invocation: true", text, skill_name)
