@@ -1,6 +1,6 @@
 ---
 name: k-nspec
-description: "Create a new SPEC (new spec) from the user's goal and the current codebase, for the reviewer <-> AI agent (/k-rvspec) loop: deep read-only repo scan, measurable pass criteria via real repo commands, critical-path IDs with files and HEAD-pinned path:line anchors, repo profile, self-resolved assumptions (no follow-up questions), commit the SPEC, then write the first-turn agent message block to docs/turnlog/turn_<n>.txt. Use when the repo has no SPEC yet, when opening the next milestone, or when re-speccing a drifted SPEC. MANUAL-ONLY: use only when the user explicitly invokes /k-nspec (or /prompt-toolkit:k-nspec, $k-nspec)."
+description: "Lập SPEC mới (new spec) từ mục tiêu của người dùng và codebase hiện tại, cho vòng làm việc người kiểm định ↔ AI agent (/k-rvspec): đọc sâu repo (chỉ đọc), dẫn xuất điều kiện đạt đo được bằng lệnh có thật, chia ID theo đường găng với tệp và neo path:line kiểm tại HEAD, điền Hồ sơ repo, tự chốt mọi giả định (không hỏi lại), commit SPEC, rồi ghi khối tin nhắn lượt đầu cho agent ra docs/turnlog/turn_<n>.txt. Dùng khi repo chưa có SPEC, khi sang mốc kế tiếp, hoặc khi lập lại SPEC đã lệch mục tiêu. MANUAL-ONLY: chỉ chạy khi người dùng gọi /k-nspec (hoặc /prompt-toolkit:k-nspec, $k-nspec, hoặc yêu cầu 'use the k-nspec skill')."
 argument-hint: "<mục tiêu (đoạn văn)> | @<tệp mục tiêu> [<mốc>] [lập lại]"
 disable-model-invocation: true
 ---
@@ -222,6 +222,8 @@ Câu ngắn, ý chính đầu câu. Không kể lại quá trình đọc repo.
 Xác định OS và shell của host trước khi chạy lệnh (bash/zsh/sh, PowerShell, Git Bash trên Windows...);
 dùng cú pháp tương thích shell hiện tại. `python -c` in tiếng Việt thì
 `sys.stdout.reconfigure(encoding='utf-8')`; `core.autocrlf` bật thì so bằng `git show HEAD:<path>`.
+Đọc/tìm tệp bằng công cụ của host (Read, Glob, Grep hoặc tương đương). Đường dẫn skill viết tương đối
+(`../k-rvspec/...`); không giả định host nào cũng có thư mục `.claude/`.
 
 ## Đầu vào của lần gọi này
 

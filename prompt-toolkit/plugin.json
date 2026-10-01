@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "prompt-toolkit",
-  "version": "2.10.0",
-  "description": "Nine manual skills for prompt and goal refinement, read-only review, engineering, SPEC-driven review loop, end-to-end delivery, and coordinator-led agent teamwork.",
+  "version": "2.11.0",
+  "description": "Ten manual skills for prompt and goal refinement, read-only review, engineering, SPEC-driven review loop, goal-spec autonomous runs, end-to-end delivery, and coordinator-led agent teamwork.",
   "author": {
     "name": "kai"
   },

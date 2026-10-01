@@ -23,6 +23,7 @@ EXPECTED_SKILLS = {
     "k-boost",
     "k-nspec",
     "k-rvspec",
+    "k-gspec",
     "k-e2e",
     "k-teamwork-preview",
 }
@@ -158,7 +159,7 @@ class TeamworkPreviewContractTest(unittest.TestCase):
         self.assertEqual(base_version, codex_version.split("+", 1)[0])
 
     def test_readme_and_manifests_advertise_nine_skills(self) -> None:
-        self.assertIn("Bộ 9 Agent Skills", self.readme)
+        self.assertIn("Bộ 10 Agent Skills", self.readme)
         for skill in EXPECTED_SKILLS:
             self.assertIn(f"`{skill}`", self.readme)
         english_manifests = [
@@ -171,9 +172,9 @@ class TeamworkPreviewContractTest(unittest.TestCase):
             MARKETPLACE_ROOT / ".cursor-plugin" / "marketplace.json",
         ]
         for manifest in english_manifests:
-            self.assertIn("Nine manual skills", read(manifest), manifest)
+            self.assertIn("Ten manual skills", read(manifest), manifest)
         self.assertIn(
-            "Bộ 9 skill", read(PLUGIN_ROOT / ".zcode-plugin" / "plugin.json")
+            "Bộ 10 skill", read(PLUGIN_ROOT / ".zcode-plugin" / "plugin.json")
         )
 
     def test_cursor_and_copilot_install_paths_are_documented(self) -> None:

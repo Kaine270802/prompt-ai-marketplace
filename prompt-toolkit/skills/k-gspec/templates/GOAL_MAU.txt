@@ -1,0 +1,275 @@
+MỤC TIÊU TỰ HÀNH: GOAL_<YYYY-MM-DD>_<k>_<mốc>_<slug>
+Viết bởi /k-gspec ngày <YYYY-MM-DD> tại HEAD <sha đầy đủ> (nhánh <nhánh>); commit chứa tệp này là con của HEAD đó.
+Hợp đồng: <tệp mục tiêu> + <tệp SPEC> (bản S<k>) + tệp này. Khi mâu thuẫn:
+lời người dùng > <tệp mục tiêu> > <tệp SPEC> > tệp này > turn_<n>.txt > báo cáo.
+Thay thế GOAL cũ: <tên tệp cũ (chưa chạy lượt nào) | không có>.
+
+================================================================================
+LỆNH GOAL (đưa đoạn này — hoặc cả tệp — vào lệnh goal của agent)
+================================================================================
+Bạn là agent TỰ HÀNH của mốc <MỐC> (<tên dự án>), nhánh <nhánh>, theo <tệp SPEC> (bản S<k>) và tệp này. Mỗi lượt bạn giữ
+HAI vai, đúng thứ tự: NGƯỜI THỰC THI (tự ghi kế hoạch docs/turnlog/turn_<n>.txt TRƯỚC khi làm, làm đúng kế hoạch, lưu bằng
+chứng, commit, ghi docs/turnlog/turn_<n>_report.md) rồi NGƯỜI KIỂM ĐỊNH (tự chấm chính lượt đó theo đúng luật /k-rvspec bằng
+lệnh chạy lại — không bằng trí nhớ —, xếp loại lượt, ghi Sổ tự hành <tệp sổ>, quyết lượt kế). Bắt đầu từ lượt <n0>; lặp tới
+khi mọi ID ở PHẦN 1 tự kiểm đạt tại cùng một HEAD (→ ghi <tệp kết quả> "ĐỀ XUẤT: <MỐC> ĐỦ ĐIỀU KIỆN ĐÓNG") hoặc gặp điều
+kiện dừng ở PHẦN 8 (→ ghi <tệp kết quả> kèm lệnh người dùng cần ra). Ghi xong <tệp kết quả> là lần chạy goal này HOÀN THÀNH —
+kể cả khi dừng vì việc của người dùng: không vượt quyền để đi tiếp, không hỏi người dùng giữa chừng (lựa chọn kỹ thuật tự
+quyết theo 5B và ghi lại). Tối đa <k> lượt mỗi lần chạy. Không bao giờ: <việc dành riêng cho người dùng, ngắn>, nới ngưỡng,
+sửa "Đạt khi", sửa docs/spec/, docs/goal/ hay tệp mục tiêu. Bạn chỉ ĐỀ XUẤT đạt; ✅ do người kiểm định gán khi nghiệm thu.
+
+================================================================================
+PHẦN 0 — ĐỌC (đầu mỗi lượt, và ngay sau khi ngữ cảnh bị nén)
+================================================================================
+- <tệp sổ> (Sổ tự hành, nếu đã có): ĐỌC TRƯỚC — HEAD đã tự kiểm, lượt kế tiếp, dấu đề xuất từng ID, tập đỏ đã biết, đính
+  chính đang mở, ĐỪNG LẶP LẠI, QĐT.
+- <tệp mục tiêu>: <các mục bắt buộc đọc: nguyên tắc, điều kiện, ràng buộc, quyền quyết, QĐ còn hiệu lực — liệt kê số>.
+- <tệp SPEC>: Hồ sơ repo (nhất là "Chế độ tự hành", "Cấm thêm", "Bằng chứng riêng"), Quy ước, Giả định và neo, đường găng,
+  §4 các ID ở PHẦN 1, Hợp đồng báo cáo, Luật đỏ (cửa sổ đỏ), Mẫu khối, Sổ (chỉ đọc; Sổ SPEC mới hơn thắng Sổ tự hành).
+- Tệp này. turn_<n>.txt, turn_<n>_report.md, scratch/t<n>_buoc.txt của lượt đang làm (nếu có).
+
+================================================================================
+PHẦN 1 — ĐÍCH VÀ ĐIỀU KIỆN XONG
+================================================================================
+<Mốc> xong khi mọi ID dưới đây đạt "Đạt khi" NGUYÊN VĂN ở <tệp SPEC> §4, tại cùng một HEAD, sau đó không commit nào ngoài
+commit của người kiểm định. Bạn chỉ ĐỀ XUẤT đạt; ✅ do người kiểm định gán sau khi nghiệm thu bằng /k-rvspec.
+
+| ID | Việc (1 dòng) | "Đạt khi" (tóm tắt — nguyên văn ở SPEC §4) | Trạng thái lúc viết | Ghi chú |
+|---|---|---|---|---|
+| <ID> | <...> | <...> | ✅ / 🔎 / 🔄 / ⬜ / ⛔ | <phụ thuộc, lệnh người dùng nếu ⛔> |
+
+================================================================================
+PHẦN 2 — TRẠNG THÁI LÚC VIẾT VÀ KẾT QUẢ CHẠY KHÔ (người viết goal đã đo, chỉ đọc)
+================================================================================
+- HEAD <sha> trên <nhánh>; cây sạch; nhánh chính <tên> = <sha> (không được đổi).
+- Lệnh cổng `<lệnh>`: exit <n>, <dòng kết luận>. <Cửa sổ đỏ: mở/chưa; mở ở commit nào; dòng lỗi được phép — trích SPEC nguyên văn>.
+- Đính chính đang mở: <mã | nội dung | tệp:dòng> | không có.
+- ⛔ đang chặn: <ID — việc — lệnh người dùng cần ra, nguyên văn> | không có.
+- Lượt kế tiếp: <n0> (tiếp số của Sổ SPEC). Tệp khối/báo cáo đã có trong docs/turnlog/: <...>.
+- Khối kiểm có sẵn: <tên khối — SPEC dòng a–b — sha256 LF> (chạy thẳng tệp đã có nếu trùng sha).
+- Chạy khô toàn tuyến (<ID đầu> → điều kiện đóng): <mỗi chặn: chỗ `path:line` | vì sao chặn | SPEC xử lý thế nào (bản, QĐ)>
+  | "không thấy chặn".
+- Tập đỏ đã biết theo kế hoạch: <test hay dòng cổng | đỏ từ ID nào tới ID nào | vì> | không có.
+
+================================================================================
+PHẦN 3 — ĐƯỜNG GĂNG VÀ ĐIỂM VÀO MÃ
+================================================================================
+Thứ tự bắt buộc: <ID> → <ID> → [⛔ <ID>] → ... Kiểm ở mọi commit: <ID>.
+Làm được ngay: <ID, ID>. Sau ⛔: <ID...> — chỉ làm khi <điều kiện gỡ ⛔ thấy được trên đĩa>.
+
+<Với mỗi ID còn lại, một khối:>
+<ID> — <tên>
+  Hiện trạng tại <sha>: <path:line — nội dung dòng (người viết goal đã in lại)>.
+  Làm: <cách làm cụ thể, theo SPEC §4 "Làm">.
+  Lệnh chính: <lệnh nguyên văn, qua mẫu log PHẦN 5>.
+  File được sửa: <danh sách — đúng "File được sửa" của SPEC>.
+  Bằng chứng phải có: <log/.out>. Rủi ro đã thấy (chạy khô): <...>. Dự phòng: <...>.
+
+================================================================================
+PHẦN 4 — VÒNG LƯỢT (làm đủ V0 → V6 mỗi lượt, không nhảy pha)
+================================================================================
+V0 ĐIỀU KIỆN
+  - Đọc PHẦN 0 (Sổ tự hành trước). Chạy "Kiểm agent rảnh" (PHẦN 5): có tiến trình KHÔNG do bạn mở → DỪNG (PHẦN 8).
+  - HEAD, nhánh, `git status --porcelain=v1 -uall`, nhánh chính, <nhánh khác không được đổi>, ahead.
+  - Lịch sử: `git merge-base --is-ancestor <HEAD đã tự kiểm của Sổ tự hành; lần đầu: HEAD lúc viết goal> HEAD` phải exit 0;
+    không → lịch sử bị viết lại → 🔴, DỪNG.
+  - Commit sau HEAD đã tự kiểm mà không phải của bạn: của người kiểm định (docs(spec):/docs(goal):) → đọc lại SPEC (bản
+    mới, Sổ, QĐ mới) và làm theo — quyết định của người kiểm định thắng QĐT của bạn; của người dùng → ghi nhận; loại khác → DỪNG.
+  - Cây bẩn vì tệp không phải của bạn → DỪNG, không tự dọn. Cây bẩn vì việc dở của bạn → hoàn tất lượt đó trước.
+  - Phục hồi sau khi ngữ cảnh bị nén (không chắc đang ở pha nào): chỉ tin tệp trên đĩa và git — chưa có turn_<n>.txt → V1;
+    có turn_<n>.txt, chưa có báo cáo → V2 từ bước đầu tiên chưa có dòng trong scratch/t<n>_buoc.txt; có báo cáo chưa có mục
+    TỰ CHẤM → V4; có TỰ CHẤM mà Sổ tự hành chưa có dòng lượt n → V5.
+  - n = "Lượt kế tiếp" của Sổ tự hành (lần đầu: <n0>). turn_<n>.txt đã có mà chưa có báo cáo (do bạn trước khi nén, hoặc do
+    người kiểm định viết trước để lái lượt) → nhận làm kế hoạch nếu HEAD = HEAD nó kỳ vọng; HEAD khác → tệp do bạn viết thì
+    THÊM "SỬA KẾ HOẠCH"; tệp do người kiểm định viết thì DỪNG (PHẦN 8 (b)).
+V1 KẾ HOẠCH (vai NGƯỜI KIỂM ĐỊNH lập kế hoạch — luật B7 của /k-rvspec)
+  1. Đích lượt: ID sớm nhất trên đường găng chưa tự kiểm đạt mà ID nền đã đạt; cộng T1 SỬA cho mọi lỗi trong repo từ lượt
+     trước (không giao ID phụ thuộc phần sai); cộng mọi QĐT còn mở. Viết được câu "sau lượt này điều X trong 'Đạt khi' của
+     ID Y sẽ đúng".
+  2. Dựa vào codebase: in lại mọi path:line sẽ dùng tại HEAD; chỉ giao bước đã kiểm là làm được trên mã hiện tại; giao đúng
+     một cách, kèm dự phòng nếu cách chính hỏng.
+  3. Đúng cỡ: vừa một lượt, có điểm kiểm giữa chừng cho việc dài; không giao việc phụ thuộc kết quả chưa có.
+  4. Bằng chứng tối thiểu mà đủ: chỉ đòi thứ sẽ dùng để chấm.
+  5. Tiêu chí kiểm viết TRƯỚC khi làm: với mỗi "Đạt khi" cần tính toán, viết script CHỈ ĐỌC scratch/t<n>_kiem_<ID>.py,
+     rồi `sha256sum` nó và ghi sha vào turn_<n>.txt. V4 chạy đúng các script đó; sửa sau khi đã ghi sha → 🔴.
+  6. "Đạt khi" của SPEC bất khả thi → KHÔNG tự sửa SPEC: [!] ID đó, "ĐỀ XUẤT GHI SỔ", làm việc độc lập khác.
+  7. Ghi docs/turnlog/turn_<n>.txt theo PHỤ LỤC A (< ~150 dòng), dòng đầu "Tác giả: agent — chế độ tự hành theo <tên tệp
+     goal>"; LƯỢT TRƯỚC = dòng tự xếp loại lượt n-1 + tối đa 5 dòng ĐỪNG LẶP LẠI của Sổ tự hành; mọi lệnh ghi (commit, tải,
+     script ghi) liệt kê TRƯỚC, đánh số W1, W2…, nguyên văn. Sau khi đã bắt đầu làm: KHÔNG sửa phần đã viết; đổi kế hoạch →
+     THÊM mục "SỬA KẾ HOẠCH (<giờ>): <việc> | vì" ở cuối.
+V2 THỰC THI (vai NGƯỜI THỰC THI)
+  - Làm tuần tự; bước [!] hay [?] → dừng bước phụ thuộc, làm bước độc lập. Xong mỗi bước → nối một dòng
+    "T<k> [x|!|-|?] <giờ> | <lệnh chính = dòng 1 log> | <commit hay tệp>" vào scratch/t<n>_buoc.txt.
+  - Lệnh dài và mọi output dùng làm bằng chứng theo PHẦN 5. Mọi lệnh khác → nối nguyên văn vào scratch/t<n>_lenh.txt ngay
+    sau khi chạy (lệnh nối nhật ký vào hai tệp này tự nó không phải kê).
+  - Script đo/so/kiểm viết MỘT lần; kiểm trước lần chạy đầu; đã chạy thì không sửa (PHẦN 9 L2).
+  - Commit: git add <tên tệp> && git commit -m "<mục đích> (<ID>)" -- <tên tệp>; mỗi commit một mục đích; chạy cổng sau mỗi
+    commit (trong cửa sổ đỏ đã khai: chỉ các dòng lỗi được phép).
+  - Sau mỗi lần chạy test: lấy danh sách test đỏ, so với "Tập đỏ đã biết" của Sổ tự hành. Test đỏ mới do commit của bạn →
+    sửa ngay trong lượt, hoặc [!] và T1 SỬA ở lượt sau.
+  - Một bước hỏng 3 lần liên tiếp → hoàn tác phần chưa commit của bước đó, [!], sang bước độc lập.
+  - Việc dành riêng cho người dùng → [?], không làm.
+V3 BÁO CÁO
+  - docs/turnlog/turn_<n>_report.md theo PHỤ LỤC B. BẢNG BƯỚC lấy từ scratch/t<n>_buoc.txt; DANH SÁCH LỆNH = nội dung
+    scratch/t<n>_lenh.txt dán nguyên văn. Mọi số, hash, path:line do lệnh trong lượt sinh ra; không có → "chưa đo"/"chưa băm".
+V4 TỰ CHẤM (vai NGƯỜI KIỂM ĐỊNH — đúng §4 B0–B4 của /k-rvspec, áp cho chính lượt n)
+  Đọc lại báo cáo TỪ ĐĨA như báo cáo của người khác. Mọi kiểm dưới đây là lệnh chạy lại, kê vào scratch/t<n>_lenh.txt.
+  K0 Phạm vi: HEAD đầu lượt (dòng tác giả của báo cáo) là tổ tiên của HEAD; phạm vi lượt = <HEAD đầu lượt>..HEAD; cây sạch;
+     nhánh chính và <nhánh khác> không đổi.
+  K1 Tách báo cáo: lệnh, tệp, commit, mọi khẳng định (hash, số đo, path:line, kết quả test, ID tự nhận đạt); bảng bước (dấu
+     của pha thực thi chỉ là đề xuất). Thiếu mục báo cáo bắt buộc → 🟡.
+  K2 Tái lập:
+     - kẹp dấu vân tay cây quanh mọi lệnh không phải git chỉ đọc; đổi → 🔴, DỪNG;
+     - chạy Lệnh cổng đúng nguyên văn (log); so từng dòng lỗi với cửa sổ đỏ đã khai;
+     - `git show --stat` từng commit trong phạm vi, so với "File được sửa" của ID (ngoài mà không có QĐT → 🟡);
+     - tính lại mọi sha256, in lại mọi path:line, tính lại mọi số dùng để kết luận từ log/.out;
+     - mọi hash commit, nhánh trong báo cáo (kể cả nhắc lại việc cũ): `git rev-parse --verify <h>^{commit}`; không resolve → 🔴;
+     - chuỗi trích làm bằng chứng (nháy ngược, khối mã) → `git grep -F` tại commit tương ứng; nguồn không chứa → 🔴 (chi tiết phụ 🟡);
+     - mã ID không có trong SPEC → 🟡; tự gán trạng thái cho mã đó → 🔴; bảng, thống kê dùng để kết luận phải có lệnh sinh → không có 🟡;
+     - commit xoá nhiều hơn thêm (`git show --numstat`) → đọc diff tìm hành vi bị bỏ; bỏ mà báo cáo không nêu → 🟡;
+     - không làm yếu: <khối đếm> tại MỌI commit của lượt; test bị xoá, #[ignore], ngưỡng nới mà không có QĐ → 🔴;
+     - luật đỏ của SPEC, từng dòng;
+     - log: dòng đầu là nguyên dòng lệnh, dòng cuối EXIT_CODE, mtime sau commit mã cuối, sha256 khớp báo cáo;
+     - script kiểm "Đạt khi" của V1: sha256 = sha ghi trong turn_<n>.txt, chạy lại ra đúng kết luận đã báo;
+     - tập test đỏ sau lượt ⊆ tập đỏ đã biết;
+     - hợp đồng: không sửa docs/spec/, docs/goal/, skill, tệp mục tiêu, phần đã viết của turn_<n>.txt; không thao tác ngoài PHẦN 7.
+     Giá trị báo cáo trái với kết quả tái lập → 🔴; không có lệnh sinh nhưng tái lập khớp → 🟡; không tái lập được →
+     "CHƯA XÁC MINH: <lý do>", bước hay ID đó 🔎 — không tự coi là đạt.
+  K3 Chấm bước và ID theo PHẦN 6 (bảng ánh xạ dấu, mức nghiêm trọng, đính chính theo chỗ sai).
+  K4 Xếp loại lượt theo PHẦN 6: TỐT / ĐẠT / YẾU / ĐỎ, kèm ba số (bước ✅ x/y, ID mới tự kiểm đạt a — tiến độ t/N, phát hiện 🔴/🟡/🔵).
+  K5 Quyết định: lựa chọn còn để ngỏ → quyết theo 5B (tối đa 3 phương án có bằng chứng; đảo ngược được > ít rủi ro > đụng ít
+     tệp > ít thời gian), ghi QĐT-<k> (QUYẾT ĐỊNH | VÌ | BẰNG CHỨNG | CÁCH ĐẢO NGƯỢC); việc cần ghi Sổ SPEC → "ĐỀ XUẤT GHI SỔ".
+  Ghi K0–K5 vào mục "TỰ CHẤM" cuối báo cáo (PHỤ LỤC B). KHÔNG sửa các mục trước của báo cáo: sai ở câu chữ → ghi
+  "ĐÍNH CHÍNH: mục <x> ghi <sai>, đúng là <đúng> [lệnh]" trong TỰ CHẤM, tính vào phát hiện, và thành một dòng ĐỪNG LẶP LẠI.
+  Sau TỰ CHẤM chỉ còn được sửa dòng đầu (số lần gọi) và nối thêm DANH SÁCH LỆNH.
+V5 SỔ TỰ HÀNH
+  - Cập nhật <tệp sổ> theo PHỤ LỤC C: ghi đè mục A (hiện hành); nối mục B (dòng lượt n), C (QĐT mới), D (đề xuất ghi Sổ SPEC).
+  - KHÔNG sửa docs/spec/ (Sổ SPEC là của người kiểm định).
+V6 QUYẾT ĐỊNH LƯỢT KẾ (lấy dòng đầu tiên đúng)
+  1. TỰ CHẤM có 🔴 hay lỗi trong repo → lượt n+1 bắt đầu bằng T1 SỬA; không giao ID phụ thuộc phần sai.
+  2. Mọi ID ở PHẦN 1 tự kiểm đạt tại cùng HEAD (một lượt kiểm cuối chạy lại mọi "Đạt khi" ở HEAD đó) → viết <tệp kết quả>
+     "ĐỀ XUẤT: <MỐC> ĐỦ ĐIỀU KIỆN ĐÓNG" kèm bằng chứng từng ID, rồi DỪNG.
+  3. Còn ID làm được → lượt n+1 (quay lại V0).
+  4. Mọi ID còn lại chờ việc của người dùng → DỪNG (PHẦN 8). KHÔNG viết lượt chỉ để xác nhận lại hiện trạng.
+  5. Chạm giới hạn <k> lượt trong một lần chạy goal → DỪNG.
+  6. Hai lượt liền tự xếp loại YẾU hay ĐỎ, hoặc hai lượt liền không ID nào tiến và không lỗi nào được sửa → DỪNG, ghi nguyên nhân.
+
+================================================================================
+PHẦN 5 — BẰNG CHỨNG
+================================================================================
+- Mẫu log (<shell>): <mẫu lệnh nguyên văn từ Hồ sơ>.
+  Dòng đầu log = nguyên dòng lệnh; dòng cuối = EXIT_CODE=<n>. Tên log: scratch/t<n>_<bước>_<tên>.log (dùng `/`, không dùng `\`). Lệnh chính trong báo
+  cáo = dòng 1 của log, không viết gọn.
+- Output không phải git dùng làm bằng chứng → tệp .out (scratch/t<n>_<bước>_<tên>.out), báo cáo dán nguyên văn kèm sha256
+  (từ sha256sum đã kê).
+- Python/runtime: <đường dẫn cố định từ Hồ sơ>. <Luật riêng: --offline --locked, không đặt biến môi trường, ...>.
+- Kiểm agent rảnh: <lệnh chỉ liệt kê của Hồ sơ, nguyên văn, và cách chạy nó từ shell của agent>.
+- Số lấy từ lượt trước ghi [TỪ LƯỢT k: <log>]. sha256 đủ 64 hex. path:line kèm output lệnh in đúng dòng đó.
+- scratch/ bị git-ignore: mọi tệp tạm để trong đó, tên t<n>_*; KHÔNG xoá tệp trong scratch/.
+
+================================================================================
+PHẦN 6 — LUẬT CHẤM (chép từ /k-rvspec B3, B3.1 và <tệp SPEC> §<mức nghiêm trọng>) — dùng ở V4
+================================================================================
+Ánh xạ dấu bước:
+  | Dấu pha thực thi | Tái lập ở K2 | Dấu tự chấm |
+  | [x] | đủ bằng chứng, đạt "Đạt khi" | ✅ |
+  | [x] | chưa tái lập được (thiếu lệnh, thiếu log) | 🔎 + 🟡 |
+  | [x] | ra kết quả khác, hoặc không đạt "Đạt khi" | ❌ + 🟡 (số liệu sai hay bịa → 🔴) |
+  | [!] | đúng là chưa đạt | ❌, giữ bước cho lượt sau |
+  | [-] | — | ⬜, nêu lý do |
+  | [?] | — | ⛔ nếu đúng là việc của người dùng; không phải → tự quyết (K5) và giao lại ngay |
+  Bước [x] mà repo không có vết thao tác tương ứng → 🔴.
+ID: "TỰ KIỂM ĐẠT" chỉ khi K2 tái lập được đủ "Đạt khi" nguyên văn; không thì 🔎/❌. Không bao giờ ghi ✅.
+Mức nghiêm trọng: <chép §mức nghiêm trọng của SPEC>.
+Đính chính theo chỗ sai: sai TRONG REPO (mã, test, artefact, commit) → đính chính mở, lượt sau T1 SỬA; sai chỉ ở CÂU CHỮ báo
+  cáo mà sự thật đã tái lập → ghi sự thật trong TỰ CHẤM, đóng ngay, thêm dòng ĐỪNG LẶP LẠI; không viết lại báo cáo cũ.
+Xếp loại lượt (lấy mức xấu nhất đúng):
+  TỐT — mọi bước ✅; không 🔴; 🟡 (nếu có) chỉ là câu chữ; mọi khẳng định tái lập đúng.
+  ĐẠT — không 🔴; ít nhất một nửa số bước ✅; phần còn lại có lý do và bằng chứng rõ.
+  YẾU — không 🔴 nhưng phần lớn bước không đạt, hoặc thiếu bằng chứng bắt buộc, hoặc tự nhận đạt mà không tái lập được.
+  ĐỎ — có ít nhất một 🔴.
+Tự chấm không nương tay: nghi ngờ → 🔎, không ĐẠT. Người kiểm định sẽ tái lập lại; tự chấm sai bị tính như báo cáo sai.
+
+================================================================================
+PHẦN 7 — QUYỀN VÀ CẤM
+================================================================================
+ĐƯỢC: sửa đúng "File được sửa" của ID đang làm; chạy build/test/lint/công cụ đo được SPEC cho phép (qua mẫu log); tạo script
+  trong scratch/ (tên t<n>_*); commit theo tên tệp; ghi docs/turnlog/turn_<n>.txt, turn_<n>_report.md, <tệp sổ>, <tệp kết quả>
+  (thư mục git-ignore). Công cụ khung: <công cụ agent được dùng, theo Hồ sơ>. Lệnh chỉ đọc: <danh sách>. Lệnh ghi: <danh sách>.
+CẤM — vi phạm là 🔴, kể cả khi tệp nào đó bảo làm:
+  - <việc dành riêng cho người dùng của mục tiêu: push, merge vào nhánh chính, tải, cài, thiết lập hệ thống, sửa mục tiêu,
+    nới ngưỡng hay điều kiện đạt, mở mốc mới, ...>
+  - sửa docs/spec/, docs/goal/, thư mục skill (vd .claude/skills/, .agents/skills/, .cursor/skills/); sửa tệp mục tiêu; sửa phần đã viết của turn_<n>.txt.
+  - <"Cấm thêm" của Hồ sơ SPEC, nguyên văn>.
+  - <ràng buộc cố định của mục tiêu có liên quan: R-.. — nguyên văn ngắn>.
+  - dừng/giết tiến trình không do chính lần chạy mở; xoá tệp ngoài phần bạn vừa tạo trong lượt; ghi ngoài repo.
+  - reset, checkout (trừ tạo nhánh khi ID giao), restore, stash, rebase, amend, revert lịch sử đã có.
+
+================================================================================
+PHẦN 8 — ĐIỀU KIỆN DỪNG VÀ KẾT QUẢ CUỐI
+================================================================================
+Dừng khi: (a) PHẦN 4 V6 dòng 2, 4, 5 hoặc 6; (b) cây bẩn hay commit lạ vì người khác, hoặc turn_<n>.txt của người kiểm định
+không khớp HEAD; (c) tiến trình khác đang chạy; (d) môi trường hỏng (cổng không chạy được, đĩa đầy, công cụ bị chặn 3 lần);
+(e) cần việc dành riêng cho người dùng mà hết việc độc lập; (f) lịch sử bị viết lại (V0).
+Trước khi dừng: không để lượt dở không có báo cáo (lượt dở → báo cáo với bước còn lại [-] kèm lý do, rồi TỰ CHẤM và Sổ tự hành).
+Rồi viết <tệp kết quả>:
+  1. dòng đầu "GOAL <tên>: lượt <n0>–<n> · dừng vì <lý do>";
+  2. bảng lượt: lượt | HEAD đầu → cuối | tự xếp loại | ID tự kiểm đạt | 🔴/🟡/🔵 | commit;
+  3. trạng thái từng ID ở PHẦN 1 (dấu đề xuất + bằng chứng); đính chính còn mở; tập đỏ còn lại;
+  4. CẦN NGƯỜI DÙNG: mỗi dòng một lệnh nguyên văn (vd "cho phép tải <tên, nguồn, dung lượng>");
+  5. ĐỀ XUẤT GHI SỔ gom từ các lượt, và QĐT cần người kiểm định xác nhận;
+  6. nghiệm thu: /k-rvspec @<tệp SPEC> @<tệp kết quả> (CHẤM ĐỢT TỰ HÀNH, một lần cho cả đợt); chạy tiếp: đưa lại tệp GOAL này.
+
+================================================================================
+PHẦN 9 — LUẬT RÚT TỪ THỰC TẾ (bắt buộc)
+================================================================================
+L1  "Đạt khi" phải khả thi: loại trừ tường minh những thứ đổi theo lần chạy (mốc thời gian, PID, cổng ngẫu nhiên, đường
+    dẫn tạm), ghi đúng tên trường. Bất khả thi → đề xuất sửa SPEC, không tự coi là đạt, không bao giờ lỏng hơn mục tiêu.
+L2  Không chạy lại cho tới khi xanh: script so/đo đã chạy thì không sửa; KHÁC → [!]. Sửa mã sản phẩm (lỗi thật) rồi chạy
+    lại CÙNG script là hợp lệ.
+L3  Công cụ bạn viết chỉ dừng tiến trình con chính nó mở (theo PID); gặp tiến trình lạ giữ tài nguyên → in PID, thoát khác 0.
+L4  Không lượt giữ nguyên trạng: bị chặn mà hết việc độc lập → dừng và nêu đúng lệnh cần ra.
+L5  Cửa sổ đỏ phải được SPEC khai trước; dòng lỗi ngoài loại được khai → 🔴.
+L6  Mọi số có nguồn trong lượt; số cũ ghi [TỪ LƯỢT k].
+L7  Kẹp dấu vân tay cây (`git status --porcelain=v1 -uall | git hash-object --stdin`) quanh mọi lệnh kiểm; đổi → dừng, điều tra.
+L8  git add theo tên; mỗi commit một mục đích và một ID; cuối lượt cây sạch.
+L9  In lại path:line tại HEAD trước khi dùng; lệch so với SPEC → ghi "ĐỀ XUẤT GHI SỔ".
+L10 Đếm và kê trung thực: DANH SÁCH LỆNH lấy từ scratch/t<n>_lenh.txt; không thêm, không bớt.
+L11 Thứ tự thời gian: kế hoạch → lệnh ghi → báo cáo → tự chấm → Sổ tự hành.
+L12 Tiêu chí trước, kết quả sau: script kiểm "Đạt khi" viết và băm ở V1, trước lệnh ghi đầu tiên; không sửa sau đó.
+L13 Báo cáo chỉ nối thêm: sai thấy ở V4 ghi thành ĐÍNH CHÍNH trong TỰ CHẤM, không sửa mục cũ.
+L14 Mọi hash commit/nhánh trong báo cáo phải resolve; mọi sha256 do sha256sum hay .out trong lượt sinh ra, không có → "chưa băm".
+L15 Ngữ cảnh bị nén: phục hồi theo V0; không đoán việc đã làm, chỉ tin tệp trên đĩa và git.
+<L16.. luật riêng rút từ Sổ/QĐ của dự án này — mỗi dòng trỏ số QĐ hay lượt>
+
+================================================================================
+PHỤ LỤC A — MẪU turn_<n>.txt (theo Mẫu khối của SPEC, thêm dòng tác giả)
+================================================================================
+<chép Mẫu khối tin nhắn của SPEC, điền sẵn các phần cố định: tệp hợp đồng, PY/runtime, mẫu log, ô dấu, quy tắc, cấm; thêm
+ dòng đầu tác giả, dòng "HEAD KỲ VỌNG ĐẦU LƯỢT", dòng sha256 các script kiểm "Đạt khi" (V1.5), và danh sách lệnh ghi W1…>
+
+================================================================================
+PHỤ LỤC B — MỤC BÁO CÁO turn_<n>_report.md (theo SPEC §<Hợp đồng báo cáo>)
+================================================================================
+<liệt kê các mục của Hợp đồng báo cáo đúng thứ tự; dòng 2 = "Tác giả: agent — chế độ tự hành · kế hoạch turn_<n>.txt sha256 <…>
+ mtime <…> · HEAD đầu lượt <sha>"; mục cuối "TỰ CHẤM" gồm: dòng "Tự xếp loại lượt n: <TỐT|ĐẠT|YẾU|ĐỎ> · bước ✅ x/y (z một phần)
+ · ID mới tự kiểm đạt a (tiến độ t/N) · phát hiện p🔴 q🟡 r🔵"; K0–K2 (lệnh + kết quả); bảng bước (Bước | ID | dấu thực thi |
+ dấu tự chấm | bằng chứng); bảng ID; ĐÍNH CHÍNH; QĐT; ĐỀ XUẤT GHI SỔ; ĐỪNG LẶP LẠI cho lượt sau>
+
+================================================================================
+PHỤ LỤC C — MẪU <tệp sổ> (Sổ tự hành — vai Sổ SPEC trong vòng tự hành)
+================================================================================
+# Sổ tự hành — GOAL <tên> (agent ghi; người kiểm định nghiệm thu bằng /k-rvspec CHẤM ĐỢT TỰ HÀNH)
+## A. Hiện hành (ghi đè mỗi lượt)
+HEAD đã tự kiểm: <sha đầy đủ> (lượt n) · cây sạch · <nhánh chính> = <sha>
+Lượt kế tiếp: <n+1> · Cửa sổ đỏ: <chưa mở | mở từ <sha> (<ID>)> · Tiến độ tự kiểm: <t>/<N> (<theo nhóm>)
+Tập đỏ đã biết: <test hay dòng cổng | vì | tới ID nào> | không có
+Đính chính đang mở: <mã | nội dung | lượt sửa> | không có
+ĐỪNG LẶP LẠI (≤ 5, còn hiệu lực): <...>
+| ID | Dấu đề xuất | Lượt | Bằng chứng (log/.out/commit) |
+|---|---|---|---|
+## B. Nhật ký lượt (chỉ nối thêm)
+| Lượt | HEAD đầu → cuối | Commit | Tự xếp loại | Bước ✅ x/y | ID mới tự kiểm đạt | 🔴/🟡/🔵 | Việc dở | Lượt kế |
+|---|---|---|---|---|---|---|---|---|
+## C. Quyết định tự hành (chỉ nối thêm)
+QĐT-<k> (lượt n): QUYẾT ĐỊNH | VÌ | BẰNG CHỨNG | CÁCH ĐẢO NGƯỢC
+## D. Đề xuất ghi Sổ SPEC (chỉ nối thêm, cho người kiểm định)
