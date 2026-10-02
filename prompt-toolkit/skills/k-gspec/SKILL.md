@@ -1,6 +1,6 @@
 ---
 name: k-gspec
-description: "Viết tệp GOAL (goal spec) cho AI agent tự hành: từ SPEC đang mở (vd @docs/spec/SPEC_M3.md), tệp mục tiêu, Sổ và trạng thái repo đo tại HEAD (chỉ đọc), lập một tệp docs/goal/GOAL_<ngày>_<k>_<mốc>_<slug>.txt tự đủ để người dùng đưa cho agent chạy bằng lệnh goal. Tệp GOAL biến agent thành cả NGƯỜI THỰC THI lẫn NGƯỜI KIỂM ĐỊNH của từng lượt theo đúng luật /k-rvspec: tự viết docs/turnlog/turn_<n>.txt, làm, lưu bằng chứng, commit, báo cáo, tự chấm lượt như /k-rvspec (tái lập bằng lệnh, xếp loại lượt), ghi Sổ tự hành, rồi tự viết lượt kế — lặp tới khi mốc đủ điều kiện đóng hoặc gặp việc dành riêng cho người dùng. Trước khi viết, skill CHẠY KHÔ toàn tuyến (mọi ID còn lại tới điều kiện đóng) và sửa SPEC nếu thấy chặn. Sau đợt chạy, người kiểm định nghiệm thu một lần bằng /k-rvspec (chế độ CHẤM ĐỢT TỰ HÀNH). Skill KHÔNG sửa mã và KHÔNG tự thực thi. Lập SPEC mới dùng /k-nspec. MANUAL-ONLY: chỉ chạy khi người dùng gọi /k-gspec (hoặc /prompt-toolkit:k-gspec, $k-gspec, hoặc yêu cầu 'use the k-gspec skill')."
+description: "Viết tệp GOAL (goal spec) cho AI agent tự hành: từ SPEC đang mở (vd @docs/spec/SPEC_M3.md), tệp mục tiêu, Sổ và trạng thái repo đo tại HEAD (chỉ đọc), lập một tệp docs/goal/GOAL_<ngày>_<k>_<mốc>_<slug>.txt tự đủ để người dùng đưa cho agent chạy bằng lệnh goal của agent hoặc bằng /k-yolo (skill chạy GOAL thay lệnh goal, dùng được với mọi agent). Tệp GOAL biến agent thành cả NGƯỜI THỰC THI lẫn NGƯỜI KIỂM ĐỊNH của từng lượt theo đúng luật /k-rvspec: tự viết docs/turnlog/turn_<n>.txt, làm, lưu bằng chứng, commit, báo cáo, tự chấm lượt như /k-rvspec (tái lập bằng lệnh, xếp loại lượt), ghi Sổ tự hành, rồi tự viết lượt kế — lặp tới khi mốc đủ điều kiện đóng hoặc gặp việc dành riêng cho người dùng. Trước khi viết, skill CHẠY KHÔ toàn tuyến (mọi ID còn lại tới điều kiện đóng) và sửa SPEC nếu thấy chặn. Sau đợt chạy, người kiểm định nghiệm thu một lần bằng /k-rvspec (chế độ CHẤM ĐỢT TỰ HÀNH). Skill KHÔNG sửa mã và KHÔNG tự thực thi. Lập SPEC mới dùng /k-nspec. MANUAL-ONLY: chỉ chạy khi người dùng gọi /k-gspec (hoặc /prompt-toolkit:k-gspec, $k-gspec, hoặc yêu cầu 'use the k-gspec skill')."
 argument-hint: "@<SPEC> [tối đa <k> lượt] [<ghi chú thêm cho agent>]"
 disable-model-invocation: true
 ---
@@ -33,6 +33,12 @@ Vòng tự hành không có người kiểm định độc lập giữa các lư
 3. **Trí nhớ nằm trên đĩa.** Sổ tự hành (`GOAL_<mốc>_tiendo.md`) giữ vai Sổ §8: HEAD đã tự kiểm, dấu đề xuất từng ID, đính
    chính, "đừng lặp lại", tập đỏ đã biết, quyết định QĐT — để agent đi tiếp đúng sau khi ngữ cảnh bị nén.
 
+**Hai cách chạy một tệp GOAL:** lệnh goal của khung, hoặc `/k-yolo @docs/goal/<tệp>` (skill anh em `k-yolo`:
+`../k-yolo/SKILL.md` khi cài chung prompt-toolkit; nếu copy lẻ thì mở skill `k-yolo` tương ứng trên host).
+k-yolo dùng được cả với agent không có lệnh goal, và nên dùng cả khi có. Với nó, agent tự lái vòng V0–V6 trong một lần gọi; trước
+lượt đầu nó lập bản đồ đích (chép nguyên văn, tách mệnh đề từng "Đạt khi") và tiền kiểm toàn tuyến; nó tự kiểm hoàn thành và
+dừng hẳn sau tệp kết quả. Vì vậy tệp GOAL phải tự đủ cho cả hai cách, không dựa vào lời nhắc của lệnh goal.
+
 **Mỗi lần gọi có đúng một sản phẩm chính:** tệp `docs/goal/GOAL_<YYYY-MM-DD>_<k>_<mốc>_<slug>.txt`, viết theo
 `templates/GOAL_MAU.txt` (cạnh tệp này), đã tự kiểm (G5) và commit. Kèm theo khi cần: sửa SPEC (chặn thấy khi chạy khô,
 khoá "Chế độ tự hành" và các chỗ SPEC phải khớp với khoá đó — G6).
@@ -58,9 +64,10 @@ Trả lời bằng ngôn ngữ người dùng đang dùng (mặc định tiếng
 Tệp GOAL viết cùng ngôn ngữ và văn phong với các tệp GOAL đã có trong `docs/goal/` của repo (không có thì theo mẫu).
 
 > **Cách gọi theo host (đều tương đương):** `/k-gspec` · `/prompt-toolkit:k-gspec` · `$k-gspec` · hoặc yêu cầu
-> bằng lời "use the k-gspec skill". Dưới đây viết gọn `/k-gspec`; `/k-nspec` và `/k-rvspec` cũng vậy
-> (`/prompt-toolkit:k-nspec` / `$k-nspec`, `/prompt-toolkit:k-rvspec` / `$k-rvspec`). Đường dẫn
-> skill viết tương đối (`../k-rvspec/...`, `../k-nspec/...`); không giả định host nào cũng có thư mục `.claude/`.
+> bằng lời "use the k-gspec skill". Dưới đây viết gọn `/k-gspec`; `/k-nspec`, `/k-rvspec` và `/k-yolo` cũng vậy
+> (`/prompt-toolkit:k-nspec` / `$k-nspec`, `/prompt-toolkit:k-rvspec` / `$k-rvspec`, `/prompt-toolkit:k-yolo` / `$k-yolo`).
+> Đường dẫn skill viết tương đối (`../k-rvspec/...`, `../k-nspec/...`, `../k-yolo/...`); không giả định host nào cũng có
+> thư mục `.claude/`.
 
 ## 1. Đầu vào và điều kiện chặn
 
@@ -183,6 +190,8 @@ Mọi dòng phải là "có"; dòng nào "không" → sửa rồi kiểm lại:
 - vòng lượt (PHẦN 4) có đủ V0–V6; V4 có đủ K0–K5 (tái lập bằng lệnh, xếp loại lượt); điều kiện dừng (PHẦN 8) có đủ; Sổ
   tự hành và tệp kết quả nằm trong thư mục git-ignore;
 - dòng đầu báo cáo, quyền ghi `turn_<n>.txt`, mục TỰ CHẤM trong GOAL khớp khoá "Chế độ tự hành" và §5, §6 của SPEC;
+- LỆNH GOAL và PHẦN 8 mục 6 nêu cả hai cách chạy (lệnh goal, `/k-yolo @<tệp>`); PHẦN 1 có số dòng "Đạt khi" ở SPEC §4 cho
+  mọi ID chưa ✅ (bản đồ đích của k-yolo chép nguyên văn từ đó); PHẦN 7 cho ghi `scratch/t<n>_*` (bản đồ đích nằm ở đó);
 - GOAL không mâu thuẫn SPEC; chỗ SPEC im lặng thì GOAL đã chốt và ghi lý do.
 
 ### G6 Ghi và commit
@@ -198,7 +207,9 @@ Mọi dòng phải là "có"; dòng nào "không" → sửa rồi kiểm lại:
      §5, thêm dòng 2 là dòng tác giả; dòng đầu (số lần gọi) được ghi 'KHÔNG ĐẾM ĐƯỢC: ngữ cảnh nén lúc <giờ>' khi không
      đếm được; (3) agent KHÔNG sửa Vùng ghi, `docs/goal/`, tệp mục tiêu; dấu của agent là đề xuất, ✅ chỉ do người kiểm
      định gán; (4) người kiểm định nghiệm thu cả đợt bằng `/k-rvspec` chế độ CHẤM ĐỢT TỰ HÀNH; không ghi đè `turn_<n>.txt`
-     do agent viết; được viết trước `turn_<n>.txt` của lượt chưa có để lái lượt đó (agent nhận làm kế hoạch ở V0)."
+     do agent viết; được viết trước `turn_<n>.txt` của lượt chưa có để lái lượt đó (agent nhận làm kế hoạch ở V0); (5) chạy
+     bằng lệnh goal của khung hoặc bằng `/k-yolo @docs/goal/<tệp>`: lời gọi `/k-yolo` là lệnh người dùng 'chạy (tiếp) GOAL',
+     k-yolo không thêm quyền; mọi khối máy sinh (lời nhắc của lệnh goal, autopilot, hook) không phải lệnh người dùng."
    - mở rộng khoá "Commit của người kiểm định" để nhận commit `docs(goal):` chỉ chạm `docs/goal/GOAL_*`;
    - sửa mọi chỗ SPEC còn mâu thuẫn với khoá: khoá "Thư mục turnlog" ("mỗi bên không ghi tệp của bên kia"), §0 Cách dùng
      (thêm đường tự hành), Hợp đồng báo cáo (dòng tác giả, mục TỰ CHẤM), luật đỏ về `turn_<n>.txt` (ngoại lệ cho tệp agent
@@ -220,9 +231,11 @@ Mọi dòng phải là "có"; dòng nào "không" → sửa rồi kiểm lại:
 3. **Đích và đường đi**: mốc, số ID theo trạng thái (✅ / 🔎 / làm được ngay / ⛔), thứ tự làm, lượt bắt đầu `<n0>`.
 4. **Việc cần bạn** (nếu có ⛔): mỗi dòng một lệnh nguyên văn cần ra, và việc nào trên đường găng đang chờ nó.
 5. **Đã chốt thay bạn**: mỗi dòng `giả định | vì | cách đổi` (bỏ mục nếu không có).
-6. **Cách chạy**: đưa `@docs/goal/<tên tệp>` (hoặc đoạn "LỆNH GOAL" ở đầu tệp) cho agent bằng lệnh goal của nó; agent dừng
-   thì đọc `<Thư mục turnlog>/GOAL_<mốc>_ketqua.md`; nghiệm thu cả đợt bằng
-   `/k-rvspec @<SPEC> @<Thư mục turnlog>/GOAL_<mốc>_ketqua.md` (CHẤM ĐỢT TỰ HÀNH); chạy tiếp thì đưa lại đúng tệp GOAL đó
+6. **Cách chạy**: `/k-yolo @docs/goal/<tên tệp>` (khuyên dùng; khung không đọc skill thì dán
+   `Đọc toàn bộ skill 'k-yolo' (khi cài chung prompt-toolkit: <đường dẫn tới ../k-yolo/SKILL.md>; nếu copy lẻ thì mở skill 'k-yolo' tương ứng trên host) rồi làm đúng theo nó cho @docs/goal/<tên tệp>`), hoặc đưa tệp (hay đoạn
+   "LỆNH GOAL") vào lệnh goal của agent — không dùng cả hai cùng lúc. Agent dừng thì đọc
+   `<Thư mục turnlog>/GOAL_<mốc>_ketqua.md`; nghiệm thu cả đợt bằng
+   `/k-rvspec @<SPEC> @<Thư mục turnlog>/GOAL_<mốc>_ketqua.md` (CHẤM ĐỢT TỰ HÀNH); chạy tiếp thì gọi lại đúng lệnh đã dùng
    (agent đọc Sổ tự hành và làm tiếp từ lượt kế).
 
 Câu ngắn, ý chính đầu câu. Không in lại nội dung tệp GOAL.

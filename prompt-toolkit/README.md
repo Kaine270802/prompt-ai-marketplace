@@ -1,8 +1,8 @@
 # prompt-toolkit
 
-Bộ 10 Agent Skills dùng chung cho nhiều coding agent, từ nâng
+Bộ 11 Agent Skills dùng chung cho nhiều coding agent, từ nâng
 cấp prompt/goal đến read-only review, implementation, deep reasoning,
-vòng kiểm định theo SPEC (k-nspec/k-rvspec/k-gspec) và
+vòng kiểm định theo SPEC (k-nspec/k-rvspec/k-gspec) + chạy GOAL trong phiên (k-yolo) và
 verification end-to-end.
 `k-teamwork-preview` điều phối team autonomous: Sentinel phỏng vấn scoping, chọn
 blueprint (Distributed / Iterative / Long Proof), lập Team Sheet + milestone DAG,
@@ -14,7 +14,7 @@ read-only → patch tối thiểu → adversarial falsification + backtracking).
 `k-rvspec` chấm từng lượt theo SPEC, commit sổ và ghi khối lượt kế tiếp cho mọi agent.
 Mỗi skill là một thư mục `SKILL.md` theo
 [Agent Skills open standard](https://agentskills.io/). Cài plugin marketplace nhận
-đủ 10 skill.
+đủ 11 skill.
 
 ## Skills
 
@@ -28,10 +28,11 @@ Mỗi skill là một thư mục `SKILL.md` theo
 | `k-nspec` | Lập SPEC mới từ mục tiêu + codebase: điều kiện đạt đo được, ID theo đường găng, Hồ sơ repo, tự chốt giả định, commit SPEC + ghi `turn_<n>.txt` | SPEC mốc theo mẫu + khối tin nhắn lượt đầu |
 | `k-rvspec` | Người kiểm định theo SPEC cho mọi agent: tái lập bằng chứng, chấm bước/ID, tự quyết, commit sổ, ghi khối lượt kế tiếp (kèm CHẤM ĐỢT TỰ HÀNH) | Xếp loại lượt + `turn_<n+1>.txt` cho agent |
 | `k-gspec` | Viết tệp GOAL cho agent tự hành: chạy khô toàn tuyến, sửa SPEC khi chặn, sinh `docs/goal/GOAL_*.txt` | Tệp GOAL tự đủ + SPEC đã khớp chế độ tự hành |
+| `k-yolo` | Chạy tệp GOAL trong phiên thay lệnh goal: bản đồ đích, tiền kiểm, tự chấm, dừng hẳn | Đợt lượt V0–V6 + `GOAL_<mốc>_ketqua.md` để `/k-rvspec` nghiệm thu |
 | `k-e2e` | Ghép `k-review → k-ask → k-goal → k-engineer → verify`, có adaptive teamwork | Hoàn thành coding task bằng direct hoặc coordinator-led subagents |
 | `k-teamwork-preview` | Sentinel + blueprint, Team Sheet + DAG, duyệt, specialists cách ly, Success Auditor | Team Sheet theo template + sign-off `APPROVED` từng milestone |
 
-`k-ask`, `k-goal`, `k-review`, `k-engineer`, `k-nspec`, `k-rvspec`, `k-gspec`, `k-e2e`, `k-teamwork-preview` là **manual-only**:
+`k-ask`, `k-goal`, `k-review`, `k-engineer`, `k-nspec`, `k-rvspec`, `k-gspec`, `k-yolo`, `k-e2e`, `k-teamwork-preview` là **manual-only**:
 chỉ dùng khi user gọi rõ tên skill. `k-boost` chạy khi user gọi `/k-boost` (hoặc nêu
 rõ cần deep thinking / verification chặt) và task khớp mục When to Activate của
 nó. Cú pháp gọi khác nhau theo host; xem bảng Quick start bên dưới.
@@ -179,6 +180,7 @@ prompt-ai-marketplace/
         ├── k-gspec/
         │   ├── SKILL.md
         │   └── templates/GOAL_MAU.txt
+        ├── k-yolo/SKILL.md
         ├── k-e2e/
         │   ├── SKILL.md
         │   └── agents/openai.yaml           # Optional Codex UI metadata
@@ -286,7 +288,7 @@ New-Item -ItemType Junction -Force -Path "$env:USERPROFILE\.cursor\plugins\local
 ```
 
 Restart Cursor hoặc **Developer: Reload Window**. Mở **Customize → Skills** và gọi
-`/k-ask`, `/k-goal`, `/k-review`, `/k-engineer`, `/k-boost`, `/k-nspec`, `/k-rvspec`, `/k-gspec`, `/k-e2e`, `/k-teamwork-preview` trong Agent chat.
+`/k-ask`, `/k-goal`, `/k-review`, `/k-engineer`, `/k-boost`, `/k-nspec`, `/k-rvspec`, `/k-gspec`, `/k-yolo`, `/k-e2e`, `/k-teamwork-preview` trong Agent chat.
 
 Nếu đã Add Marketplace trỏ vào folder này rồi bị `Failed to resolve git ref "HEAD"`:
 Uninstall plugin đó, rồi dùng `~/.cursor/plugins/local` ở trên. Muốn giữ marketplace
@@ -380,7 +382,7 @@ agy plugin install "$(pwd)/prompt-toolkit"
 agy plugin list
 ```
 
-Plugin native cung cấp đủ 10 skill. Restart hoặc mở
+Plugin native cung cấp đủ 11 skill. Restart hoặc mở
 conversation mới sau khi cài để refresh catalog.
 Xem [Antigravity Plugins](https://antigravity.google/docs/plugins) và
 [Asynchronous Subagents](https://antigravity.google/docs/subagents).
@@ -450,7 +452,7 @@ grok plugin uninstall prompt-toolkit --confirm --keep-data
 grok plugin install "$(pwd)" --trust
 ```
 
-`grok inspect` phải hiển thị `prompt-toolkit` với 10 skills.
+`grok inspect` phải hiển thị `prompt-toolkit` với 11 skills.
 
 ### Gemini CLI
 
@@ -631,6 +633,6 @@ và `AGENTS.md` trong workspace `PROMPT AI`; `k-e2e` kết hợp behavioral core
 `k-review`, `k-ask` và `k-engineer`. `k-teamwork-preview` được port từ folder
 `teamwork-preview/` trong workspace `PROMPT AI`: Coordinator / Hiring Manager, Team
  Sheet, cổng duyệt bắt buộc, launch native-or-sequential, independent Verifier rồi
- Critic/Auditor. `k-nspec`/`k-rvspec`/`k-gspec` là vòng kiểm định theo SPEC (lập SPEC mốc rồi chấm từng lượt
-qua sổ + khối `turn_<n>.txt`, kèm tệp GOAL cho đợt tự hành), đã chuẩn hóa đa-host (đường dẫn tương đối, cú pháp gọi
-`/k-*` · `/prompt-toolkit:k-*` · `$k-*` · "use the k-* skill", công cụ đọc/tìm của host).
+ Critic/Auditor. `k-nspec`/`k-rvspec`/`k-gspec`/`k-yolo` là vòng kiểm định theo SPEC (lập SPEC mốc rồi chấm từng lượt
+qua sổ + khối `turn_<n>.txt`, kèm tệp GOAL cho đợt tự hành và skill chạy GOAL trong phiên), đã chuẩn hóa đa-host
+(đường dẫn tương đối, cú pháp gọi `/k-*` · `/prompt-toolkit:k-*` · `$k-*` · "use the k-* skill", công cụ đọc/tìm của host).

@@ -1,6 +1,6 @@
 ---
 name: k-rvspec
-description: "Người kiểm định theo SPEC (review SPEC đang chạy) cho vòng làm việc với một AI agent bất kỳ (Antigravity, Claude Code, Codex, Cursor, Copilot, Aider...) trên repo bất kỳ: tái lập bằng chứng từ báo cáo lượt trước, chấm từng bước và từng ID, tự quyết mọi lựa chọn theo mục tiêu và codebase (không có mục 'Cần bạn quyết'), cập nhật và commit sổ SPEC, rồi ghi khối tin nhắn cho agent — kế hoạch lượt kế tiếp để đi tới mục tiêu — ra docs/turnlog/turn_<n>.txt. Nghiệm thu một đợt agent tự hành theo tệp GOAL (k-gspec) bằng chế độ CHẤM ĐỢT TỰ HÀNH. Lập SPEC mới thì dùng /k-nspec. MANUAL-ONLY: chỉ chạy khi người dùng gọi /k-rvspec (hoặc /prompt-toolkit:k-rvspec, $k-rvspec, hoặc yêu cầu 'use the k-rvspec skill')."
+description: "Người kiểm định theo SPEC (review SPEC đang chạy) cho vòng làm việc với một AI agent bất kỳ (Antigravity, Claude Code, Codex, Cursor, Copilot, Aider...) trên repo bất kỳ: tái lập bằng chứng từ báo cáo lượt trước, chấm từng bước và từng ID, tự quyết mọi lựa chọn theo mục tiêu và codebase (không có mục 'Cần bạn quyết'), cập nhật và commit sổ SPEC, rồi ghi khối tin nhắn cho agent — kế hoạch lượt kế tiếp để đi tới mục tiêu — ra docs/turnlog/turn_<n>.txt. Nghiệm thu một đợt agent tự hành theo tệp GOAL (k-gspec; chạy bằng lệnh goal hay /k-yolo) bằng chế độ CHẤM ĐỢT TỰ HÀNH. Lập SPEC mới thì dùng /k-nspec. MANUAL-ONLY: chỉ chạy khi người dùng gọi /k-rvspec (hoặc /prompt-toolkit:k-rvspec, $k-rvspec, hoặc yêu cầu 'use the k-rvspec skill')."
 argument-hint: "@<SPEC> @<docs/turnlog/turn_<n>_report.md> — hoặc @<SPEC> @<docs/turnlog/GOAL_<mốc>_ketqua.md> (đợt tự hành) — hoặc @<SPEC> rồi dán 'KẾT QUẢ TRƯỚC AI AGENT PHẢN HỒI LƯỢT TRƯỚC LÀ: <phản hồi>'"
 disable-model-invocation: true
 ---
@@ -36,9 +36,9 @@ khóa nào thiếu thì dùng mặc định của skill. Mẫu SPEC và mẫu m�
 nếu copy lẻ thì mở thư mục `templates/` của skill `k-nspec` tương ứng trên host của bạn).
 
 > **Cách gọi theo host (đều tương đương):** `/k-rvspec` · `/prompt-toolkit:k-rvspec` · `$k-rvspec` · hoặc yêu cầu
-> bằng lời "use the k-rvspec skill". Dưới đây viết gọn `/k-rvspec`; `/k-nspec` cũng vậy
-> (`/prompt-toolkit:k-nspec` / `$k-nspec` / "use the k-nspec skill"). Đính kèm tệp bằng `@`, đường dẫn
-> skill viết tương đối (`../k-nspec/...`); không giả định host nào cũng có thư mục `.claude/`.
+> bằng lời "use the k-rvspec skill". Dưới đây viết gọn `/k-rvspec`; `/k-nspec`, `/k-gspec` và `/k-yolo` cũng vậy
+> (`/prompt-toolkit:k-nspec` / `$k-nspec`, `/prompt-toolkit:k-gspec` / `$k-gspec`, `/prompt-toolkit:k-yolo` / `$k-yolo`).
+> Đính kèm tệp bằng `@`, đường dẫn skill viết tương đối (`../k-nspec/...`); không giả định host nào cũng có thư mục `.claude/`.
 
 ## 1. Chế độ
 
@@ -434,8 +434,17 @@ Làm như §4, với các khác biệt dưới đây; mọi luật khác của �
   kế (sửa lỗi trong repo, đảo ngược một QĐT, đổi thứ tự) — agent chạy lại GOAL sẽ nhận nó làm kế hoạch ở V0; dòng đầu tệp đó
   ghi `Tác giả: người kiểm định (k-rvspec) — lái đợt tự hành`. Không cần lái → không ghi; Kết luận nói "chạy lại tệp GOAL
   <tên>" (hoặc lập GOAL mới bằng `/k-gspec` khi SPEC đổi nhiều). Mốc đủ điều kiện đóng → như "Mốc xong" của B7.
+- **Đợt chạy bằng `/k-yolo`** (skill chạy GOAL thay lệnh goal; `turn_<n>.txt` có dòng `CHAY BANG: /k-yolo`):
+  - tin người dùng = lời gọi `/k-yolo @docs/goal/…` (= "chạy (tiếp) GOAL") và tin người gõ sau đó; khối autopilot, hook, nhắc
+    giờ vẫn là máy sinh;
+  - kiểm thêm bản đồ đích `scratch/t<n>_dich.md`: sha khớp dòng trong `turn_<n>.txt`; "Đạt khi" trong đó trùng SPEC §4 tại HEAD
+    đầu lượt (`git show <sha>:<SPEC>`); mỗi mệnh đề có đúng một dòng `<ID> DK<k>` trong script kiểm của V1. Thiếu mệnh đề mà tự
+    nhận đạt → chấm như "báo đạt mà không đạt" theo mức của SPEC;
+  - lần chạy dừng ở tiền kiểm (0 lượt) chỉ để lại `scratch/t<n>_*`: không có gì để chấm;
+  - tệp kết quả của k-yolo tính đợt từ `Lượt kế tiếp cần chấm`; dòng 2 nêu lần chạy cuối;
+  - khoá "Chế độ tự hành" của SPEC chưa nhắc `/k-yolo` → thêm ở B6: lời gọi là lệnh người dùng, k-yolo không thêm quyền.
 - **Trả lời:** như §5, nhưng mục 1 có một dòng xếp loại cho MỖI lượt của đợt rồi một dòng tổng của đợt; mục 7 nêu tệp
-  `turn_<n+1>.txt` vừa ghi, hoặc "chạy lại GOAL <tên tệp>".
+  `turn_<n+1>.txt` vừa ghi, hoặc "chạy lại GOAL <tên tệp>" (`/k-yolo @docs/goal/<tên tệp>`).
 
 ## 5. Định dạng trả lời (CHẤM LƯỢT)
 

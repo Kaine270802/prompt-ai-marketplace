@@ -4,7 +4,7 @@
     {
       "name": "prompt-toolkit",
       "source": "./prompt-toolkit",
-      "description": "Bộ 10 skill cho prompt/goal refinement, read-only review, delivery end-to-end, vòng kiểm định theo SPEC và coordinator-led agent teamwork."
+      "description": "Bộ 11 skill cho prompt/goal refinement, read-only review, delivery end-to-end, vòng kiểm định theo SPEC, goal-spec tự hành và coordinator-led agent teamwork."
     }
   ]
 }

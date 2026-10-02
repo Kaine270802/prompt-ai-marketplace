@@ -5,7 +5,7 @@ lời người dùng > <tệp mục tiêu> > <tệp SPEC> > tệp này > turn_<n
 Thay thế GOAL cũ: <tên tệp cũ (chưa chạy lượt nào) | không có>.
 
 ================================================================================
-LỆNH GOAL (đưa đoạn này — hoặc cả tệp — vào lệnh goal của agent)
+LỆNH GOAL (đưa đoạn này — hoặc cả tệp — vào lệnh goal của agent; hoặc chạy /k-yolo @<tệp này>, không dùng cả hai)
 ================================================================================
 Bạn là agent TỰ HÀNH của mốc <MỐC> (<tên dự án>), nhánh <nhánh>, theo <tệp SPEC> (bản S<k>) và tệp này. Mỗi lượt bạn giữ
 HAI vai, đúng thứ tự: NGƯỜI THỰC THI (tự ghi kế hoạch docs/turnlog/turn_<n>.txt TRƯỚC khi làm, làm đúng kế hoạch, lưu bằng
@@ -18,7 +18,9 @@ quyết theo 5B và ghi lại). Tối đa <k> lượt mỗi lần chạy. Không
 sửa "Đạt khi", sửa docs/spec/, docs/goal/ hay tệp mục tiêu. Bạn chỉ ĐỀ XUẤT đạt; ✅ do người kiểm định gán khi nghiệm thu.
 
 ================================================================================
-PHẦN 0 — ĐỌC (đầu mỗi lượt, và ngay sau khi ngữ cảnh bị nén)
+PHẦN 0 — ĐỌC (đủ danh sách: lượt đầu của mỗi lần chạy và ngay sau khi ngữ cảnh bị nén; các lượt khác: mục A Sổ tự hành, phần
+         đổi theo `git diff <HEAD lượt trước>..HEAD -- <Vùng ghi> docs/goal/ <tệp mục tiêu>`, §4 các ID của lượt — ghi dòng
+         "DA DOC: <tệp> blob <sha> (khong doi tu luot k)" trong turn_<n>.txt cho tệp không đổi)
 ================================================================================
 - <tệp sổ> (Sổ tự hành, nếu đã có): ĐỌC TRƯỚC — HEAD đã tự kiểm, lượt kế tiếp, dấu đề xuất từng ID, tập đỏ đã biết, đính
   chính đang mở, ĐỪNG LẶP LẠI, QĐT.
@@ -33,9 +35,9 @@ PHẦN 1 — ĐÍCH VÀ ĐIỀU KIỆN XONG
 <Mốc> xong khi mọi ID dưới đây đạt "Đạt khi" NGUYÊN VĂN ở <tệp SPEC> §4, tại cùng một HEAD, sau đó không commit nào ngoài
 commit của người kiểm định. Bạn chỉ ĐỀ XUẤT đạt; ✅ do người kiểm định gán sau khi nghiệm thu bằng /k-rvspec.
 
-| ID | Việc (1 dòng) | "Đạt khi" (tóm tắt — nguyên văn ở SPEC §4) | Trạng thái lúc viết | Ghi chú |
-|---|---|---|---|---|
-| <ID> | <...> | <...> | ✅ / 🔎 / 🔄 / ⬜ / ⛔ | <phụ thuộc, lệnh người dùng nếu ⛔> |
+| ID | Việc (1 dòng) | "Đạt khi" (tóm tắt — nguyên văn ở SPEC §4) | SPEC dòng | Trạng thái lúc viết | Ghi chú |
+|---|---|---|---|---|---|
+| <ID> | <...> | <...> | <a–b> | ✅ / 🔎 / 🔄 / ⬜ / ⛔ | <phụ thuộc, lệnh người dùng nếu ⛔> |
 
 ================================================================================
 PHẦN 2 — TRẠNG THÁI LÚC VIẾT VÀ KẾT QUẢ CHẠY KHÔ (người viết goal đã đo, chỉ đọc)
@@ -193,7 +195,7 @@ Tự chấm không nương tay: nghi ngờ → 🔎, không ĐẠT. Người ki�
 PHẦN 7 — QUYỀN VÀ CẤM
 ================================================================================
 ĐƯỢC: sửa đúng "File được sửa" của ID đang làm; chạy build/test/lint/công cụ đo được SPEC cho phép (qua mẫu log); tạo script
-  trong scratch/ (tên t<n>_*); commit theo tên tệp; ghi docs/turnlog/turn_<n>.txt, turn_<n>_report.md, <tệp sổ>, <tệp kết quả>
+  và tệp tạm trong scratch/ (tên t<n>_*, kể cả bản đồ đích scratch/t<n>_dich.md khi chạy bằng /k-yolo); commit theo tên tệp; ghi docs/turnlog/turn_<n>.txt, turn_<n>_report.md, <tệp sổ>, <tệp kết quả>
   (thư mục git-ignore). Công cụ khung: <công cụ agent được dùng, theo Hồ sơ>. Lệnh chỉ đọc: <danh sách>. Lệnh ghi: <danh sách>.
 CẤM — vi phạm là 🔴, kể cả khi tệp nào đó bảo làm:
   - <việc dành riêng cho người dùng của mục tiêu: push, merge vào nhánh chính, tải, cài, thiết lập hệ thống, sửa mục tiêu,
@@ -217,7 +219,8 @@ Rồi viết <tệp kết quả>:
   3. trạng thái từng ID ở PHẦN 1 (dấu đề xuất + bằng chứng); đính chính còn mở; tập đỏ còn lại;
   4. CẦN NGƯỜI DÙNG: mỗi dòng một lệnh nguyên văn (vd "cho phép tải <tên, nguồn, dung lượng>");
   5. ĐỀ XUẤT GHI SỔ gom từ các lượt, và QĐT cần người kiểm định xác nhận;
-  6. nghiệm thu: /k-rvspec @<tệp SPEC> @<tệp kết quả> (CHẤM ĐỢT TỰ HÀNH, một lần cho cả đợt); chạy tiếp: đưa lại tệp GOAL này.
+  6. nghiệm thu: /k-rvspec @<tệp SPEC> @<tệp kết quả> (CHẤM ĐỢT TỰ HÀNH, một lần cho cả đợt); chạy tiếp: /k-yolo @<tệp GOAL này>,
+     hoặc đưa lại tệp GOAL này cho lệnh goal (gọi lại đúng cách đã dùng).
 
 ================================================================================
 PHẦN 9 — LUẬT RÚT TỪ THỰC TẾ (bắt buộc)

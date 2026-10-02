@@ -1,8 +1,8 @@
 # prompt-ai-marketplace
 
-Marketplace chứa plugin **`prompt-toolkit`** (v2.11.0): bộ 10 Agent Skills dùng chung cho
+Marketplace chứa plugin **`prompt-toolkit`** (v2.12.0): bộ 11 Agent Skills dùng chung cho
 nhiều coding agent — từ nâng cấp prompt/goal, review read-only, implementation,
-deep reasoning, vòng kiểm định theo SPEC (k-nspec/k-rvspec/k-gspec),
+deep reasoning, vòng kiểm định theo SPEC (k-nspec/k-rvspec/k-gspec) + chạy GOAL trong phiên (k-yolo),
 đến delivery end-to-end và autonomous agent teamwork. Tối ưu output layout
 dễ đọc cho tiếng Việt.
 
@@ -10,7 +10,7 @@ dễ đọc cho tiếng Việt.
 
 | Plugin | Version | Skills | Mô tả |
 |---|---|---|---|
-| `prompt-toolkit` | 2.11.0 | `k-ask`, `k-goal`, `k-review`, `k-engineer`, `k-boost`, `k-nspec`, `k-rvspec`, `k-gspec`, `k-e2e`, `k-teamwork-preview` | Prompt/goal refinement, read-only audit, engineering có test, deep reasoning, vòng kiểm định theo SPEC, goal-spec tự hành, end-to-end delivery, teamwork có duyệt + audit độc lập |
+| `prompt-toolkit` | 2.12.0 | `k-ask`, `k-goal`, `k-review`, `k-engineer`, `k-boost`, `k-nspec`, `k-rvspec`, `k-gspec`, `k-yolo`, `k-e2e`, `k-teamwork-preview` | Prompt/goal refinement, read-only audit, engineering có test, deep reasoning, vòng kiểm định theo SPEC, goal-spec tự hành, chạy GOAL trong phiên, end-to-end delivery, teamwork có duyệt + audit độc lập |
 
 | Skill | Làm gì | Kết quả |
 |---|---|---|
@@ -22,10 +22,11 @@ dễ đọc cho tiếng Việt.
 | `k-nspec` | Lập SPEC mới từ mục tiêu + codebase: điều kiện đạt đo được, ID theo đường găng, Hồ sơ repo, tự chốt giả định, commit SPEC + ghi `turn_<n>.txt` | SPEC mốc theo mẫu + khối tin nhắn lượt đầu |
 | `k-rvspec` | Người kiểm định theo SPEC: tái lập bằng chứng, chấm bước/ID, tự quyết, commit sổ, ghi khối lượt kế tiếp (kèm CHẤM ĐỢT TỰ HÀNH) | Xếp loại lượt + `turn_<n+1>.txt` cho agent |
 | `k-gspec` | Viết tệp GOAL cho agent tự hành: chạy khô toàn tuyến, sửa SPEC khi chặn, sinh `docs/goal/GOAL_*.txt` | Tệp GOAL tự đủ + SPEC đã khớp chế độ tự hành |
+| `k-yolo` | Chạy tệp GOAL trong phiên thay lệnh goal: bản đồ đích, tiền kiểm, tự chấm, dừng hẳn | Đợt lượt V0–V6 + `GOAL_<mốc>_ketqua.md` để `/k-rvspec` nghiệm thu |
 | `k-e2e` | Ghép `k-review → k-ask → k-goal → k-engineer → verify` (GOAL file làm hợp đồng) | Task hoàn thành, direct hoặc teamwork |
 | `k-teamwork-preview` | Sentinel + blueprint, Team Sheet + DAG, duyệt, specialists cách ly, Success Auditor | Team Sheet theo template + sign-off `APPROVED` từng milestone |
 
-`k-ask`, `k-goal`, `k-review`, `k-engineer`, `k-nspec`, `k-rvspec`, `k-gspec`, `k-e2e`, `k-teamwork-preview` là **manual-only**
+`k-ask`, `k-goal`, `k-review`, `k-engineer`, `k-nspec`, `k-rvspec`, `k-gspec`, `k-yolo`, `k-e2e`, `k-teamwork-preview` là **manual-only**
 (`disable-model-invocation: true`): chỉ chạy khi bạn gọi rõ tên skill.
 `k-boost` chạy khi bạn gọi `/k-boost` hoặc nêu rõ cần deep thinking / verification chặt.
 
@@ -67,12 +68,13 @@ cp -R ./prompt-toolkit/skills/* <skills-dir-cua-host>/
 /k-nspec Mục tiêu release M1: login 401 hết kẹt loading
 /k-rvspec @docs/spec/SPEC_M1.md @docs/turnlog/turn_1_report.md
 /k-gspec @docs/spec/SPEC_M1.md tối đa 8 lượt
+/k-yolo @docs/goal/GOAL_2026-10-02_1_M1_login.txt
 /k-e2e Sửa lỗi login bị kẹt loading khi API trả 401 và thêm regression test
 /k-teamwork-preview Xây feature này bằng một team có independent audit
 ```
 
-- Host dùng namespace: `/prompt-toolkit:k-e2e`, `/prompt-toolkit:k-teamwork-preview`, `/prompt-toolkit:k-nspec`, `/prompt-toolkit:k-rvspec`, `/prompt-toolkit:k-gspec`.
-- Host dùng `$skill`: `$k-e2e`, `$k-teamwork-preview`, `$k-nspec`, `$k-rvspec`, `$k-gspec`.
+- Host dùng namespace: `/prompt-toolkit:k-e2e`, `/prompt-toolkit:k-teamwork-preview`, `/prompt-toolkit:k-nspec`, `/prompt-toolkit:k-rvspec`, `/prompt-toolkit:k-gspec`, `/prompt-toolkit:k-yolo`.
+- Host dùng `$skill`: `$k-e2e`, `$k-teamwork-preview`, `$k-nspec`, `$k-rvspec`, `$k-gspec`, `$k-yolo`.
 - Trên Antigravity, native `/teamwork-preview` được ưu tiên nếu đã sở hữu session;
   skill plugin thì chọn trong `/skills` theo source `prompt-toolkit`.
 
@@ -109,6 +111,7 @@ prompt-ai-marketplace/
         ├── k-nspec/SKILL.md + templates/
         ├── k-rvspec/SKILL.md
         ├── k-gspec/SKILL.md + templates/
+        ├── k-yolo/SKILL.md
         ├── k-e2e/SKILL.md
         └── k-teamwork-preview/
             ├── SKILL.md
